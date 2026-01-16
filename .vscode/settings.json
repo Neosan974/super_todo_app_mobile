@@ -1,0 +1,21 @@
+{
+    "editor.formatOnSave": true,
+    "dart.devToolsBrowser": "default",
+    "dart.lineLength": 120,
+    "[dart]": {
+        "editor.tabSize": 2,
+        "editor.insertSpaces": true,
+        "editor.detectIndentation": false,
+        "editor.suggest.insertMode": "replace",
+        "editor.defaultFormatter": "Dart-Code.dart-code",
+        "editor.inlayHints.enabled": "onUnlessPressed",
+        "editor.codeActionsOnSave": {
+            "source.fixAll": "explicit",
+        }
+    },
+    "cSpell.words": [
+        "daos",
+        "usecases",
+        "uuid"
+    ]
+}
