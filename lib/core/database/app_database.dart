@@ -11,12 +11,13 @@ part "app_database.g.dart";
 
 @DriftDatabase(tables: [ProjectEntries], daos: [ProjectDao]) // Ajoute le DAO ici
 class AppDatabase extends _$AppDatabase {
-  AppDatabase() : super(_openConnection());
+  AppDatabase([QueryExecutor? e]) : super(e ?? _openConnection());
 
   @override
   int get schemaVersion => 1;
 
   // On expose le DAO pour pouvoir l'utiliser dans le Repository
+  @override
   ProjectDao get projectDao => ProjectDao(this);
 }
 

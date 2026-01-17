@@ -10,11 +10,11 @@ import "package:super_todo_app_mobile/features/projects/domain/usecases/update_p
 
 final sl = GetIt.instance; // sl pour Service Locator
 
-Future<void> init() async {
+Future<void> init({AppDatabase? database}) async {
   // 1. Base de données & DAOs
-  final database = AppDatabase();
-  sl.registerSingleton<AppDatabase>(database);
-  sl.registerSingleton<ProjectDao>(database.projectDao);
+  final db = database ?? AppDatabase();
+  sl.registerSingleton<AppDatabase>(db);
+  sl.registerSingleton<ProjectDao>(db.projectDao);
 
   // 2. Repositories
   // On enregistre l'implémentation liée à l'interface

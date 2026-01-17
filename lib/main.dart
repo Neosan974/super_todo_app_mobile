@@ -1,15 +1,16 @@
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
+import "package:super_todo_app_mobile/core/database/app_database.dart";
 import "package:super_todo_app_mobile/core/di/injection_container.dart" as di;
 import "package:super_todo_app_mobile/features/projects/presentation/manager/project_provider.dart";
 import "package:super_todo_app_mobile/features/projects/presentation/pages/project_list_page.dart";
 
-void main() async {
+void main({AppDatabase? db}) async {
   // 1. Indispensable pour initialiser les plugins (SQLite/PathProvider)
   WidgetsFlutterBinding.ensureInitialized();
 
   // 2. Initialise GetIt (BDD, Repositories, UseCases)
-  await di.init();
+  await di.init(database: db);
 
   runApp(const MyApp());
 }

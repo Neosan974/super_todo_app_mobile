@@ -14,7 +14,11 @@
         }
     },
     "cSpell.words": [
+        "cupertino",
         "daos",
+        "mocktail",
+        "sqlite",
+        "usecase",
         "usecases",
         "uuid"
     ]
