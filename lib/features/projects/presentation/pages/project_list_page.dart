@@ -3,7 +3,8 @@ import "package:provider/provider.dart";
 import "package:super_todo_app_mobile/features/projects/domain/entities/project.dart";
 import "package:super_todo_app_mobile/features/projects/presentation/manager/project_provider.dart";
 import "package:super_todo_app_mobile/features/projects/presentation/pages/project_detail_page.dart";
-import "package:super_todo_app_mobile/features/projects/presentation/widgets/project_form_widget.dart";
+import "package:super_todo_app_mobile/features/projects/presentation/widgets/project_form.dart";
+import "package:super_todo_app_mobile/features/projects/presentation/widgets/project_list_item.dart";
 
 class ProjectListPage extends StatefulWidget {
   const ProjectListPage({super.key});
@@ -27,7 +28,7 @@ class _ProjectListPageState extends State<ProjectListPage> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(project == null ? "Nouveau Projet" : "Modifier le projet"),
-        content: ProjectFormWidget(
+        content: ProjectForm(
           project: project,
           onSave: (name, description) {
             final provider = context.read<ProjectProvider>();
@@ -72,29 +73,20 @@ class _ProjectListPageState extends State<ProjectListPage> {
             itemBuilder: (context, index) {
               final project = provider.projects[index];
 
-              return Dismissible(
-                key: Key(project.id.toString()),
-                background: Container(
-                  color: Colors.red,
-                  alignment: Alignment.centerRight,
-                  child: const Icon(Icons.delete, color: Colors.white),
-                ),
-                onDismissed: (_) {
+              return ProjectListItem(
+                project: project,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ProjectDetailPage(project: project),
+                    ),
+                  );
+                },
+                onEdit: () => _showProjectDialog(context, project: project),
+                onDelete: () {
                   provider.removeProject(project.id!);
                 },
-                child: ListTile(
-                  title: Text(project.name),
-                  subtitle: Text(project.description),
-                  onLongPress: () => _showProjectDialog(context, project: project),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ProjectDetailPage(project: project),
-                      ),
-                    );
-                  },
-                ),
               );
             },
           );

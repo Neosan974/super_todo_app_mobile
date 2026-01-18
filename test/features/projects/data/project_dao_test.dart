@@ -22,7 +22,7 @@ void main() {
     // 1. Arrange : Préparer l'entrée
     final folder = ProjectEntriesCompanion.insert(
       name: "Test Project",
-      description: "Test Description",
+      description: Value("Test Description"),
       createdAt: Value(DateTime.now()),
     );
 

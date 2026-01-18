@@ -17,6 +17,7 @@
         "cupertino",
         "daos",
         "mocktail",
+        "nullable",
         "sqlite",
         "usecase",
         "usecases",

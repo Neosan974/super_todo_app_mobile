@@ -42,9 +42,9 @@ class $ProjectEntriesTable extends ProjectEntries
   late final GeneratedColumn<String> description = GeneratedColumn<String>(
     'body',
     aliasedName,
-    false,
+    true,
     type: DriftSqlType.string,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
   );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
@@ -88,8 +88,6 @@ class $ProjectEntriesTable extends ProjectEntries
         _descriptionMeta,
         description.isAcceptableOrUnknown(data['body']!, _descriptionMeta),
       );
-    } else if (isInserting) {
-      context.missing(_descriptionMeta);
     }
     if (data.containsKey('created_at')) {
       context.handle(
@@ -117,7 +115,7 @@ class $ProjectEntriesTable extends ProjectEntries
       description: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}body'],
-      )!,
+      ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -134,12 +132,12 @@ class $ProjectEntriesTable extends ProjectEntries
 class ProjectEntry extends DataClass implements Insertable<ProjectEntry> {
   final int id;
   final String name;
-  final String description;
+  final String? description;
   final DateTime createdAt;
   const ProjectEntry({
     required this.id,
     required this.name,
-    required this.description,
+    this.description,
     required this.createdAt,
   });
   @override
@@ -147,7 +145,9 @@ class ProjectEntry extends DataClass implements Insertable<ProjectEntry> {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['name'] = Variable<String>(name);
-    map['body'] = Variable<String>(description);
+    if (!nullToAbsent || description != null) {
+      map['body'] = Variable<String>(description);
+    }
     map['created_at'] = Variable<DateTime>(createdAt);
     return map;
   }
@@ -156,7 +156,9 @@ class ProjectEntry extends DataClass implements Insertable<ProjectEntry> {
     return ProjectEntriesCompanion(
       id: Value(id),
       name: Value(name),
-      description: Value(description),
+      description: description == null && nullToAbsent
+          ? const Value.absent()
+          : Value(description),
       createdAt: Value(createdAt),
     );
   }
@@ -169,7 +171,7 @@ class ProjectEntry extends DataClass implements Insertable<ProjectEntry> {
     return ProjectEntry(
       id: serializer.fromJson<int>(json['id']),
       name: serializer.fromJson<String>(json['name']),
-      description: serializer.fromJson<String>(json['description']),
+      description: serializer.fromJson<String?>(json['description']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
   }
@@ -179,7 +181,7 @@ class ProjectEntry extends DataClass implements Insertable<ProjectEntry> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'name': serializer.toJson<String>(name),
-      'description': serializer.toJson<String>(description),
+      'description': serializer.toJson<String?>(description),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
   }
@@ -187,12 +189,12 @@ class ProjectEntry extends DataClass implements Insertable<ProjectEntry> {
   ProjectEntry copyWith({
     int? id,
     String? name,
-    String? description,
+    Value<String?> description = const Value.absent(),
     DateTime? createdAt,
   }) => ProjectEntry(
     id: id ?? this.id,
     name: name ?? this.name,
-    description: description ?? this.description,
+    description: description.present ? description.value : this.description,
     createdAt: createdAt ?? this.createdAt,
   );
   ProjectEntry copyWithCompanion(ProjectEntriesCompanion data) {
@@ -232,7 +234,7 @@ class ProjectEntry extends DataClass implements Insertable<ProjectEntry> {
 class ProjectEntriesCompanion extends UpdateCompanion<ProjectEntry> {
   final Value<int> id;
   final Value<String> name;
-  final Value<String> description;
+  final Value<String?> description;
   final Value<DateTime> createdAt;
   const ProjectEntriesCompanion({
     this.id = const Value.absent(),
@@ -243,10 +245,9 @@ class ProjectEntriesCompanion extends UpdateCompanion<ProjectEntry> {
   ProjectEntriesCompanion.insert({
     this.id = const Value.absent(),
     required String name,
-    required String description,
+    this.description = const Value.absent(),
     this.createdAt = const Value.absent(),
-  }) : name = Value(name),
-       description = Value(description);
+  }) : name = Value(name);
   static Insertable<ProjectEntry> custom({
     Expression<int>? id,
     Expression<String>? name,
@@ -264,7 +265,7 @@ class ProjectEntriesCompanion extends UpdateCompanion<ProjectEntry> {
   ProjectEntriesCompanion copyWith({
     Value<int>? id,
     Value<String>? name,
-    Value<String>? description,
+    Value<String?>? description,
     Value<DateTime>? createdAt,
   }) {
     return ProjectEntriesCompanion(
@@ -647,14 +648,14 @@ typedef $$ProjectEntriesTableCreateCompanionBuilder =
     ProjectEntriesCompanion Function({
       Value<int> id,
       required String name,
-      required String description,
+      Value<String?> description,
       Value<DateTime> createdAt,
     });
 typedef $$ProjectEntriesTableUpdateCompanionBuilder =
     ProjectEntriesCompanion Function({
       Value<int> id,
       Value<String> name,
-      Value<String> description,
+      Value<String?> description,
       Value<DateTime> createdAt,
     });
 
@@ -854,7 +855,7 @@ class $$ProjectEntriesTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 Value<String> name = const Value.absent(),
-                Value<String> description = const Value.absent(),
+                Value<String?> description = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
               }) => ProjectEntriesCompanion(
                 id: id,
@@ -866,7 +867,7 @@ class $$ProjectEntriesTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 required String name,
-                required String description,
+                Value<String?> description = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
               }) => ProjectEntriesCompanion.insert(
                 id: id,

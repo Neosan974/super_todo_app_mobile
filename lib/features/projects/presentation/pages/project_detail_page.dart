@@ -3,6 +3,8 @@ import "package:provider/provider.dart";
 import "package:super_todo_app_mobile/features/projects/domain/entities/project.dart";
 import "package:super_todo_app_mobile/features/tasks/domain/entities/task.dart";
 import "package:super_todo_app_mobile/features/tasks/presentation/manager/task_provider.dart";
+import "package:super_todo_app_mobile/features/tasks/presentation/widgets/task_form.dart";
+import "package:super_todo_app_mobile/features/tasks/presentation/widgets/task_list_item.dart";
 
 class ProjectDetailPage extends StatefulWidget {
   final Project project;
@@ -24,39 +26,26 @@ class _ProjectDetailPageState extends State<ProjectDetailPage> {
   }
 
   void _showTaskDialog(BuildContext context, {Task? taskToEdit}) {
-    // Si on édite, on pré-remplit le contrôleur avec le titre actuel
-    final controller = TextEditingController(text: taskToEdit?.title ?? "");
-
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: Text(taskToEdit == null ? "Nouvelle tâche" : "Modifier la tâche"),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          decoration: const InputDecoration(hintText: "Nom de la tâche"),
+        content: TaskForm(
+          initialTitle: taskToEdit?.title,
+          onSave: (newTitle) async {
+            final provider = context.read<TaskProvider>(); // On utilise le context de la page
+
+            if (taskToEdit == null) {
+              await provider.addTask(newTitle, widget.project.id!);
+            } else {
+              await provider.renameTask(taskToEdit, newTitle);
+            }
+
+            if (context.mounted) {
+              Navigator.pop(dialogContext); // On ferme le dialogue via son propre context
+            }
+          },
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Annuler"),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              final name = controller.text.trim();
-              if (name.isNotEmpty) {
-                final provider = context.read<TaskProvider>();
-                if (taskToEdit == null) {
-                  await provider.addTask(name, widget.project.id!);
-                } else {
-                  await provider.renameTask(taskToEdit, name);
-                }
-                if (context.mounted) Navigator.pop(context);
-              }
-            },
-            child: const Text("Enregistrer"),
-          ),
-        ],
       ),
     );
   }
@@ -77,34 +66,11 @@ class _ProjectDetailPageState extends State<ProjectDetailPage> {
             itemCount: provider.tasks.length,
             itemBuilder: (context, index) {
               final task = provider.tasks[index];
-              // Dans le ListView.builder :
-              return Dismissible(
-                key: Key(task.id.toString()),
-                direction: DismissDirection.endToStart,
-                background: Container(
-                  color: Colors.red,
-                  alignment: Alignment.centerRight,
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: const Icon(Icons.delete, color: Colors.white),
-                ),
-                onDismissed: (direction) {
-                  context.read<TaskProvider>().removeTask(task.id!, widget.project.id!);
-                },
-                child: ListTile(
-                  title: Text(
-                    task.title,
-                    style: TextStyle(
-                      decoration: task.isCompleted ? TextDecoration.lineThrough : null,
-                    ),
-                  ),
-                  onTap: () => _showTaskDialog(context, taskToEdit: task),
-                  leading: Checkbox(
-                    value: task.isCompleted,
-                    onChanged: (_) {
-                      context.read<TaskProvider>().toggleTaskStatus(task);
-                    },
-                  ),
-                ),
+              return TaskListItem(
+                task: task,
+                onToggle: () => provider.toggleTaskStatus(task),
+                onDelete: () => provider.removeTask(task.id!, widget.project.id!),
+                onTap: () => _showTaskDialog(context, taskToEdit: task),
               );
             },
           );
