@@ -4,6 +4,7 @@ import "package:super_todo_app_mobile/core/database/app_database.dart";
 import "package:super_todo_app_mobile/core/di/injection_container.dart" as di;
 import "package:super_todo_app_mobile/features/projects/presentation/manager/project_provider.dart";
 import "package:super_todo_app_mobile/features/projects/presentation/pages/project_list_page.dart";
+import "package:super_todo_app_mobile/features/tasks/presentation/manager/task_provider.dart";
 
 void main({AppDatabase? db}) async {
   // 1. Indispensable pour initialiser les plugins (SQLite/PathProvider)
@@ -30,6 +31,14 @@ class MyApp extends StatelessWidget {
             addProjectUseCase: di.sl(),
             updateProjectUseCase: di.sl(),
             deleteProjectUseCase: di.sl(),
+          ),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => TaskProvider(
+            getTasksByProjectUseCase: di.sl(),
+            addTaskUseCase: di.sl(),
+            updateTaskUseCase: di.sl(),
+            deleteTaskUseCase: di.sl(),
           ),
         ),
       ],

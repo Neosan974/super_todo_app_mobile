@@ -2,6 +2,7 @@ import "package:flutter/material.dart";
 import "package:provider/provider.dart";
 import "package:super_todo_app_mobile/features/projects/domain/entities/project.dart";
 import "package:super_todo_app_mobile/features/projects/presentation/manager/project_provider.dart";
+import "package:super_todo_app_mobile/features/projects/presentation/pages/project_detail_page.dart";
 import "package:super_todo_app_mobile/features/projects/presentation/widgets/project_form_widget.dart";
 
 class ProjectListPage extends StatefulWidget {
@@ -85,6 +86,14 @@ class _ProjectListPageState extends State<ProjectListPage> {
                   title: Text(project.name),
                   subtitle: Text(project.description),
                   onLongPress: () => _showProjectDialog(context, project: project),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ProjectDetailPage(project: project),
+                      ),
+                    );
+                  },
                 ),
               );
             },
