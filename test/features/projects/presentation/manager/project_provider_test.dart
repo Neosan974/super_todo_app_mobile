@@ -57,6 +57,21 @@ void main() {
     verify(() => mockGetProjects.execute()).called(1);
   });
 
+  test("doit exposer la liste des projets via le getter projects", () async {
+    final tProject = Project(name: "name", createdAt: DateTime.now());
+    // Arrange : On prépare le mock pour retourner une liste
+    when(() => mockGetProjects.execute()).thenAnswer((_) async => [tProject]);
+
+    // Act
+    await provider.fetchProjects();
+
+    // Assert
+    // En appelant 'provider.projects', tu exécutes la ligne 25
+    expect(provider.projects, isA<List<Project>>());
+    expect(provider.projects.length, 1);
+    expect(provider.projects.first, tProject);
+  });
+
   test("doit ajouter un projet avec succès", () async {
     // Arrange
     const tName = "Nouveau Projet";

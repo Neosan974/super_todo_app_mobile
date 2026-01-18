@@ -12,9 +12,6 @@ class ProjectDao extends DatabaseAccessor<AppDatabase> with _$ProjectDaoMixin {
   // Toutes tes requêtes migrent ici
   Future<List<ProjectEntry>> getAllProjects() => select(projectEntries).get();
 
-  // Drift gère aussi les Streams (très puissant pour l'UI auto-update)
-  Stream<List<ProjectEntry>> watchAllProjects() => select(projectEntries).watch();
-
   Future<int> insertProject(ProjectEntriesCompanion entry) => into(projectEntries).insert(entry);
 
   Future<bool> updateProject(ProjectEntriesCompanion entry) => update(projectEntries).replace(entry);

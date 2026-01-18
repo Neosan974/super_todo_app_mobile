@@ -1,3 +1,5 @@
+import "dart:developer";
+
 import "package:flutter/material.dart";
 import "package:super_todo_app_mobile/features/tasks/domain/entities/task.dart";
 import "package:super_todo_app_mobile/features/tasks/domain/usecases/add_task.dart";
@@ -31,7 +33,7 @@ class TaskProvider extends ChangeNotifier {
     try {
       _tasks = await getTasksByProjectUseCase.execute(projectId);
     } catch (e) {
-      debugPrint("Erreur tasks: $e");
+      log("Erreur tasks: $e");
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -45,7 +47,7 @@ class TaskProvider extends ChangeNotifier {
       await addTaskUseCase.execute(newTask);
       await fetchTasks(projectId); // Rafraîchit la liste automatiquement
     } catch (e) {
-      debugPrint("Erreur ajout tâche: $e");
+      log("Erreur ajout tâche: $e");
     }
   }
 
@@ -55,7 +57,7 @@ class TaskProvider extends ChangeNotifier {
       await updateTaskUseCase.execute(updatedTask);
       await fetchTasks(task.projectId);
     } catch (e) {
-      debugPrint("Erreur toggle: $e");
+      log("Erreur toggle: $e");
     }
   }
 
@@ -65,7 +67,7 @@ class TaskProvider extends ChangeNotifier {
       await deleteTaskUseCase.execute(taskId);
       await fetchTasks(projectId);
     } catch (e) {
-      debugPrint("Erreur suppression: $e");
+      log("Erreur suppression: $e");
     }
   }
 
@@ -77,7 +79,7 @@ class TaskProvider extends ChangeNotifier {
       await updateTaskUseCase.execute(updatedTask);
       await fetchTasks(task.projectId);
     } catch (e) {
-      debugPrint("Erreur renommage: $e");
+      log("Erreur renommage: $e");
     }
   }
 }

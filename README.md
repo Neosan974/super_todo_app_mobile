@@ -14,3 +14,13 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+
+## Testing
+
+The command to launch tests with relevant coverage report :
+`fvm flutter test --coverage && \
+lcov --remove coverage/lcov.info \
+'**/*.g.dart' \
+'lib/features/*/data/datasources/*_table.dart' \
+-o coverage/lcov_cleaned.info && \
+genhtml coverage/lcov_cleaned.info -o coverage/html`

@@ -25,6 +25,7 @@ class AppDatabase extends _$AppDatabase {
   TaskDao get taskDao => TaskDao(this);
 }
 
+// coverage:ignore-start
 LazyDatabase _openConnection() {
   return LazyDatabase(() async {
     final dbFolder = await getApplicationDocumentsDirectory();
@@ -32,3 +33,5 @@ LazyDatabase _openConnection() {
     return NativeDatabase.createInBackground(file);
   });
 }
+
+// coverage:ignore-end
