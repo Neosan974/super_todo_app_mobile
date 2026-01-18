@@ -6,6 +6,10 @@ class UpdateTask {
   UpdateTask(this.repository);
 
   Future<void> execute(Task task) async {
+    if (task.isCompleted) {
+      throw Exception("Modification impossible : la tâche est déjà terminée.");
+    }
+
     return await repository.updateTask(task);
   }
 }
