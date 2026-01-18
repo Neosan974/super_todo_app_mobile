@@ -78,7 +78,9 @@ class _ProjectListPageState extends State<ProjectListPage> {
                   alignment: Alignment.centerRight,
                   child: const Icon(Icons.delete, color: Colors.white),
                 ),
-                onDismissed: (_) => provider.removeProject(project.id!),
+                onDismissed: (_) {
+                  provider.removeProject(project.id!);
+                },
                 child: ListTile(
                   title: Text(project.name),
                   subtitle: Text(project.description),

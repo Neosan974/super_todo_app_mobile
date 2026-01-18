@@ -21,5 +21,8 @@
         "usecase",
         "usecases",
         "uuid"
-    ]
+    ],
+    "coverage-gutters.showLineCoverage": true,
+    "coverage-gutters.showRulerCoverage": true,
+    "coverage-gutters.watchOnActivate": true
 }

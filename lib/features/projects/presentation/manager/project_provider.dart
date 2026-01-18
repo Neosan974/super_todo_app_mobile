@@ -1,3 +1,6 @@
+import "dart:async";
+import "dart:developer";
+
 import "package:flutter/material.dart";
 import "package:super_todo_app_mobile/features/projects/domain/entities/project.dart";
 import "package:super_todo_app_mobile/features/projects/domain/usecases/add_project.dart";
@@ -28,10 +31,14 @@ class ProjectProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    _projects = await getProjectsUseCase.execute();
-
-    _isLoading = false;
-    notifyListeners();
+    try {
+      _projects = await getProjectsUseCase.execute();
+    } catch (e, stackTrace) {
+      log(e.toString(), error: e, zone: Zone.current, time: DateTime.now(), stackTrace: stackTrace);
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   Future<void> createProject(String name, String description) async {
