@@ -24,5 +24,17 @@
     ],
     "coverage-gutters.showLineCoverage": true,
     "coverage-gutters.showRulerCoverage": true,
-    "coverage-gutters.watchOnActivate": true
+    "coverage-gutters.watchOnActivate": true,
+    "coverage-gutters.showGutterCoverage": true,
+    "coverage-gutters.coverageFileNames": [
+        "lcov.info",
+        "cov.xml",
+        "coverage.xml",
+        "cobertura.xml",
+        "jacoco.xml",
+        "coverage.cobertura.xml",
+        "coverage/lcov.info",
+        "coverage/lcov_cleaned.info"
+    ],
+    "editor.stickyScroll.enabled": false,
 }
