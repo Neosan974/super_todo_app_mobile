@@ -11,6 +11,7 @@ import "package:super_todo_app_mobile/features/tasks/domain/repositories/task_re
 import "package:super_todo_app_mobile/features/tasks/domain/usecases/add_task.dart";
 import "package:super_todo_app_mobile/features/tasks/domain/usecases/delete_task.dart";
 import "package:super_todo_app_mobile/features/tasks/domain/usecases/get_tasks_by_project.dart";
+import "package:super_todo_app_mobile/features/tasks/domain/usecases/toggle_task_status.dart";
 import "package:super_todo_app_mobile/features/tasks/domain/usecases/update_task.dart";
 
 final sl = GetIt.instance; // sl pour Service Locator
@@ -38,6 +39,7 @@ Future<void> init({AppDatabase? database}) async {
   sl.registerLazySingleton(() => AddTask(sl()));
   sl.registerLazySingleton(() => UpdateTask(sl()));
   sl.registerLazySingleton(() => DeleteTask(sl()));
+  sl.registerLazySingleton(() => ToggleTaskStatus(sl()));
 
   // 4. External (si tu as besoin d'un client HTTP par exemple plus tard)
 }

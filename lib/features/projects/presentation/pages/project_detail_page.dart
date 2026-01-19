@@ -1,3 +1,5 @@
+import "dart:async";
+
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
 import "package:super_todo_app_mobile/features/projects/domain/entities/project.dart";
@@ -9,6 +11,8 @@ import "package:super_todo_app_mobile/features/tasks/presentation/widgets/task_l
 class ProjectDetailPage extends StatefulWidget {
   final Project project;
 
+  static final newTaskButtonKey = Key("new_task_button");
+
   const ProjectDetailPage({super.key, required this.project});
 
   @override
@@ -16,6 +20,8 @@ class ProjectDetailPage extends StatefulWidget {
 }
 
 class _ProjectDetailPageState extends State<ProjectDetailPage> {
+  StreamSubscription? _errorSubscription;
+
   @override
   void initState() {
     super.initState();
@@ -23,6 +29,26 @@ class _ProjectDetailPageState extends State<ProjectDetailPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<TaskProvider>().fetchTasks(widget.project.id!);
     });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _errorSubscription = context.read<TaskProvider>().errorStream.listen((error) {
+        if (!mounted) return;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(error.message),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _errorSubscription?.cancel(); // Très important pour éviter les fuites mémoire
+    super.dispose();
   }
 
   void _showTaskDialog(BuildContext context, {Task? taskToEdit}) {
@@ -41,7 +67,7 @@ class _ProjectDetailPageState extends State<ProjectDetailPage> {
               await provider.renameTask(taskToEdit, newTitle);
             }
 
-            if (context.mounted) {
+            if (dialogContext.mounted) {
               Navigator.pop(dialogContext); // On ferme le dialogue via son propre context
             }
           },
@@ -68,7 +94,9 @@ class _ProjectDetailPageState extends State<ProjectDetailPage> {
               final task = provider.tasks[index];
               return TaskListItem(
                 task: task,
-                onToggle: () => provider.toggleTaskStatus(task),
+                onToggle: () async {
+                  await provider.toggleTaskStatus(task);
+                },
                 onDelete: () => provider.removeTask(task.id!, widget.project.id!),
                 onTap: () => _showTaskDialog(context, taskToEdit: task),
               );
@@ -77,6 +105,7 @@ class _ProjectDetailPageState extends State<ProjectDetailPage> {
         },
       ),
       floatingActionButton: FloatingActionButton(
+        key: ProjectDetailPage.newTaskButtonKey,
         onPressed: () {
           _showTaskDialog(context);
         },

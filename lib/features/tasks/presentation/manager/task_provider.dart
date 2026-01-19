@@ -1,10 +1,14 @@
+import "dart:async";
 import "dart:developer";
 
 import "package:flutter/material.dart";
+import "package:super_todo_app_mobile/core/errors/app_error.dart";
+import "package:super_todo_app_mobile/core/errors/unknown_error.dart";
 import "package:super_todo_app_mobile/features/tasks/domain/entities/task.dart";
 import "package:super_todo_app_mobile/features/tasks/domain/usecases/add_task.dart";
 import "package:super_todo_app_mobile/features/tasks/domain/usecases/delete_task.dart";
 import "package:super_todo_app_mobile/features/tasks/domain/usecases/get_tasks_by_project.dart";
+import "package:super_todo_app_mobile/features/tasks/domain/usecases/toggle_task_status.dart";
 import "package:super_todo_app_mobile/features/tasks/domain/usecases/update_task.dart";
 
 class TaskProvider extends ChangeNotifier {
@@ -12,12 +16,16 @@ class TaskProvider extends ChangeNotifier {
   final AddTask addTaskUseCase;
   final UpdateTask updateTaskUseCase;
   final DeleteTask deleteTaskUseCase;
+  final ToggleTaskStatus toggleTaskStatusUseCase;
+
+  final _errorController = StreamController<AppError>.broadcast();
 
   TaskProvider({
     required this.getTasksByProjectUseCase,
     required this.addTaskUseCase,
     required this.updateTaskUseCase,
     required this.deleteTaskUseCase,
+    required this.toggleTaskStatusUseCase,
   });
 
   List<Task> _tasks = [];
@@ -25,6 +33,14 @@ class TaskProvider extends ChangeNotifier {
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
+
+  Stream<AppError> get errorStream => _errorController.stream;
+
+  @override
+  void dispose() {
+    _errorController.close();
+    super.dispose();
+  }
 
   Future<void> fetchTasks(int projectId) async {
     _isLoading = true;
@@ -34,6 +50,7 @@ class TaskProvider extends ChangeNotifier {
       _tasks = await getTasksByProjectUseCase.execute(projectId);
     } catch (e) {
       log("Erreur tasks: $e");
+      _errorController.add(UnknownError());
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -48,16 +65,20 @@ class TaskProvider extends ChangeNotifier {
       await fetchTasks(projectId); // Rafraîchit la liste automatiquement
     } catch (e) {
       log("Erreur ajout tâche: $e");
+      _errorController.add(UnknownError());
     }
   }
 
   Future<void> toggleTaskStatus(Task task) async {
-    final updatedTask = task.copyWith(isCompleted: !task.isCompleted);
     try {
-      await updateTaskUseCase.execute(updatedTask);
+      // On utilise le use case dédié qui n'a pas la restriction de verrouillage
+      await toggleTaskStatusUseCase.execute(task);
       await fetchTasks(task.projectId);
+    } on TaskUpdateError catch (e) {
+      _errorController.add(e);
     } catch (e) {
       log("Erreur toggle: $e");
+      _errorController.add(UnknownError());
     }
   }
 
@@ -68,6 +89,7 @@ class TaskProvider extends ChangeNotifier {
       await fetchTasks(projectId);
     } catch (e) {
       log("Erreur suppression: $e");
+      _errorController.add(UnknownError());
     }
   }
 
@@ -78,8 +100,11 @@ class TaskProvider extends ChangeNotifier {
     try {
       await updateTaskUseCase.execute(updatedTask);
       await fetchTasks(task.projectId);
+    } on TaskUpdateError catch (e) {
+      _errorController.add(e);
     } catch (e) {
       log("Erreur renommage: $e");
+      _errorController.add(UnknownError());
     }
   }
 }

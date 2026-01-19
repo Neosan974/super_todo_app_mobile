@@ -9,6 +9,8 @@ import "package:super_todo_app_mobile/features/projects/presentation/widgets/pro
 class ProjectListPage extends StatefulWidget {
   const ProjectListPage({super.key});
 
+  static final newProjectButtonKey = Key("new_project_button");
+
   @override
   State<ProjectListPage> createState() => _ProjectListPageState();
 }
@@ -93,6 +95,7 @@ class _ProjectListPageState extends State<ProjectListPage> {
         },
       ),
       floatingActionButton: FloatingActionButton(
+        key: ProjectListPage.newProjectButtonKey,
         onPressed: () {
           // C'est ici qu'on appellera plus tard notre AddProjectUseCase
           _showProjectDialog(context);

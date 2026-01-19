@@ -37,6 +37,7 @@ void main() {
     when(() => mockProjectProvider.isLoading).thenReturn(false);
     when(() => mockProjectProvider.projects).thenReturn([]);
     when(() => mockProjectProvider.fetchProjects()).thenAnswer((_) async => {});
+    when(() => mockTaskProvider.errorStream).thenAnswer((_) => const Stream.empty());
 
     // Mocks pour TaskProvider (nécessaires dès que ProjectDetailPage s'affiche)
     when(() => mockTaskProvider.isLoading).thenReturn(false);

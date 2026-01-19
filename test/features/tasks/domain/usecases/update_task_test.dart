@@ -37,7 +37,7 @@ void main() {
   test("doit renvoyer une Failure (ou lever une Exception) quand on tente de modifier une tâche terminée", () async {
     // Assert
     // On vérifie que le Use Case bloque l'appel avant d'atteindre le repository
-    expect(() => usecase.execute(tDoneTask), throwsA(isA<Exception>()));
+    expect(() => usecase.execute(tDoneTask), throwsA(isA<TaskUpdateError>()));
     verifyNever(() => mockRepository.updateTask(any()));
   });
 }

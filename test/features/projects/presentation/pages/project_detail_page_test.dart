@@ -1,10 +1,15 @@
+import "dart:async";
+
 import "package:flutter/material.dart";
 import "package:flutter_test/flutter_test.dart";
 import "package:mocktail/mocktail.dart";
 import "package:provider/provider.dart";
+import "package:super_todo_app_mobile/core/errors/app_error.dart";
+import "package:super_todo_app_mobile/core/errors/unknown_error.dart";
 import "package:super_todo_app_mobile/features/projects/domain/entities/project.dart";
 import "package:super_todo_app_mobile/features/projects/presentation/pages/project_detail_page.dart";
 import "package:super_todo_app_mobile/features/tasks/domain/entities/task.dart";
+import "package:super_todo_app_mobile/features/tasks/domain/usecases/update_task.dart";
 import "package:super_todo_app_mobile/features/tasks/presentation/manager/task_provider.dart";
 import "package:super_todo_app_mobile/features/tasks/presentation/widgets/task_form.dart";
 
@@ -26,6 +31,7 @@ void main() {
     when(() => mockProvider.fetchTasks(any())).thenAnswer((_) async => {});
     when(() => mockProvider.addTask(any(), any())).thenAnswer((_) async => {});
     when(() => mockProvider.renameTask(any(), any())).thenAnswer((_) async => {});
+    when(() => mockProvider.errorStream).thenAnswer((_) => const Stream.empty());
   });
 
   setUpAll(() {
@@ -155,5 +161,78 @@ void main() {
     await tester.pumpAndSettle(); // Attendre l'animation de disparition
 
     verify(() => mockProvider.removeTask(tTasks[0].id!, tProject.id!)).called(1);
+  });
+
+  testWidgets("doit afficher une SnackBar rouge quand une erreur survient", (tester) async {
+    final errorController = StreamController<AppError>();
+    // On remplace le stream vide par notre controller pour ce test précis
+    when(() => mockProvider.errorStream).thenAnswer((_) => errorController.stream);
+
+    await tester.pumpWidget(createWidgetUnderTest(tProject));
+
+    // On simule l'erreur
+    errorController.add(TaskUpdateError(message: "Modification impossible"));
+
+    // On laisse le temps au listener de réagir et à l'animation de démarrer
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 750));
+
+    expect(find.byType(SnackBar), findsOneWidget);
+    expect(find.text("Modification impossible"), findsOneWidget);
+
+    errorController.close();
+  });
+
+  testWidgets("doit afficher le message précis de TaskUpdateError", (tester) async {
+    final errorController = StreamController<AppError>();
+    when(() => mockProvider.errorStream).thenAnswer((_) => errorController.stream);
+
+    await tester.pumpWidget(createWidgetUnderTest(tProject));
+
+    // On simule l'erreur métier que nous avons créée
+    errorController.add(TaskUpdateError(message: "Modification impossible : tâche finie"));
+
+    await tester.pump(); // Déclenche le listener
+    await tester.pump(const Duration(milliseconds: 750)); // Attend l'animation
+
+    expect(find.text("Modification impossible : tâche finie"), findsOneWidget);
+
+    final snackBar = tester.widget<SnackBar>(find.byType(SnackBar));
+    expect(snackBar.backgroundColor, Colors.red);
+
+    errorController.close();
+  });
+
+  testWidgets("doit afficher un message générique pour une UnknownError", (tester) async {
+    final errorController = StreamController<AppError>();
+    when(() => mockProvider.errorStream).thenAnswer((_) => errorController.stream);
+
+    await tester.pumpWidget(createWidgetUnderTest(tProject));
+
+    // On simule une erreur imprévue
+    errorController.add(UnknownError());
+
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 750));
+
+    // Vérifie que le message par défaut de UnknownError est là
+    expect(find.text("Une erreur inattendue est survenue"), findsOneWidget);
+
+    errorController.close();
+  });
+
+  testWidgets("doit annuler l'abonnement au stream lors du dispose", (tester) async {
+    final errorController = StreamController<AppError>();
+    when(() => mockProvider.errorStream).thenAnswer((_) => errorController.stream);
+
+    await tester.pumpWidget(createWidgetUnderTest(tProject));
+
+    // On remplace le widget par un autre pour forcer le dispose de ProjectDetailPage
+    await tester.pumpWidget(const SizedBox());
+
+    // On vérifie que le controller n'a plus d'écouteurs actifs (le cancel a fonctionné)
+    expect(errorController.hasListener, isFalse);
+
+    errorController.close();
   });
 }
