@@ -35,7 +35,8 @@ void main() {
     expect(isEdited, true);
 
     // Test du clic sur la poubelle
-    await tester.tap(find.byIcon(Icons.delete_outline));
+    await tester.drag(find.byKey(Key("project_1")), Offset(-500, 0));
+    await tester.pumpAndSettle();
     expect(isDeleted, true);
   });
 }

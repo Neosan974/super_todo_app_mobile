@@ -141,7 +141,7 @@ void main() {
     ).called(1);
   });
 
-  testWidgets("doit supprimer un projet lors du clic sur delete", (tester) async {
+  testWidgets("doit supprimer un projet lors du drag vers la gauche de celui-ci", (tester) async {
     final tProject = Project(id: 1, name: "Projet Test", createdAt: DateTime.now());
     when(() => mockProjectProvider.projects).thenReturn([tProject]);
     when(() => mockProjectProvider.removeProject(any())).thenAnswer((_) async => {});
@@ -150,8 +150,8 @@ void main() {
     await tester.pump();
 
     // Clique sur l'icône de suppression (Ligne 86)
-    await tester.tap(find.byIcon(Icons.delete_outline));
-    await tester.pump();
+    await tester.drag(find.byKey(Key("project_1")), Offset(-500, 0));
+    await tester.pumpAndSettle();
 
     // Vérifie l'appel (Ligne 87)
     verify(() => mockProjectProvider.removeProject(1)).called(1);

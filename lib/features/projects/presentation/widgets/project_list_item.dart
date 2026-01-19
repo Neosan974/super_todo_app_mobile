@@ -17,15 +17,19 @@ class ProjectListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      key: Key("project_item_${project.id}"),
-      title: Text(project.name),
-      trailing: IconButton(
-        icon: const Icon(Icons.delete_outline, color: Colors.red),
-        onPressed: onDelete,
+    return Dismissible(
+      key: Key("project_${project.id}"),
+      onDismissed: (direction) {
+        if (direction == DismissDirection.endToStart) {
+          onDelete();
+        }
+      },
+      child: ListTile(
+        key: Key("project_item_${project.id}"),
+        title: Text(project.name),
+        onLongPress: onEdit,
+        onTap: onTap,
       ),
-      onLongPress: onEdit,
-      onTap: onTap,
     );
   }
 }
