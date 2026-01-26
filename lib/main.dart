@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
             addTaskUseCase: di.sl(),
             updateTaskUseCase: di.sl(),
             deleteTaskUseCase: di.sl(),
-            toggleTaskStatusUseCase: di.sl(),
+            updateTaskStatusUseCase: di.sl(),
           ),
         ),
       ],

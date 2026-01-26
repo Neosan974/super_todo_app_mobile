@@ -8,7 +8,7 @@ import "package:super_todo_app_mobile/features/tasks/domain/entities/task.dart";
 import "package:super_todo_app_mobile/features/tasks/domain/usecases/add_task.dart";
 import "package:super_todo_app_mobile/features/tasks/domain/usecases/delete_task.dart";
 import "package:super_todo_app_mobile/features/tasks/domain/usecases/get_tasks_by_project.dart";
-import "package:super_todo_app_mobile/features/tasks/domain/usecases/toggle_task_status.dart";
+import "package:super_todo_app_mobile/features/tasks/domain/usecases/update_task_status.dart";
 import "package:super_todo_app_mobile/features/tasks/domain/usecases/update_task.dart";
 
 class TaskProvider extends ChangeNotifier {
@@ -16,7 +16,7 @@ class TaskProvider extends ChangeNotifier {
   final AddTask addTaskUseCase;
   final UpdateTask updateTaskUseCase;
   final DeleteTask deleteTaskUseCase;
-  final ToggleTaskStatus toggleTaskStatusUseCase;
+  final UpdateTaskStatus updateTaskStatusUseCase;
 
   final _errorController = StreamController<AppError>.broadcast();
 
@@ -25,7 +25,7 @@ class TaskProvider extends ChangeNotifier {
     required this.addTaskUseCase,
     required this.updateTaskUseCase,
     required this.deleteTaskUseCase,
-    required this.toggleTaskStatusUseCase,
+    required this.updateTaskStatusUseCase,
   });
 
   List<Task> _tasks = [];
@@ -72,7 +72,7 @@ class TaskProvider extends ChangeNotifier {
   Future<void> toggleTaskStatus(Task task) async {
     try {
       // On utilise le use case dédié qui n'a pas la restriction de verrouillage
-      await toggleTaskStatusUseCase.execute(task);
+      await updateTaskStatusUseCase.execute(task);
       await fetchTasks(task.projectId);
     } on TaskUpdateError catch (e) {
       _errorController.add(e);

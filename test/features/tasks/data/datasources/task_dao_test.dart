@@ -2,6 +2,7 @@ import "package:drift/native.dart";
 import "package:flutter_test/flutter_test.dart";
 import "package:super_todo_app_mobile/core/database/app_database.dart";
 import "package:super_todo_app_mobile/features/tasks/data/datasources/task_dao.dart";
+import "package:super_todo_app_mobile/features/tasks/domain/entities/task_status.dart";
 
 void main() {
   late AppDatabase db;
@@ -22,6 +23,7 @@ void main() {
     final newTask = TaskEntriesCompanion.insert(
       title: "Ma nouvelle tâche",
       projectId: 1,
+      status: TaskStatus.todo,
     );
 
     // 2. Action : Insertion
@@ -33,6 +35,7 @@ void main() {
     expect(tasks.length, 1);
     expect(tasks.first.title, "Ma nouvelle tâche");
     expect(tasks.first.projectId, 1);
+    expect(tasks.first.status, TaskStatus.todo);
   });
 
   test("doit mettre à jour une tâche existante", () async {
@@ -40,6 +43,7 @@ void main() {
     final initialTask = TaskEntriesCompanion.insert(
       title: "Tâche Initiale",
       projectId: 1,
+      status: TaskStatus.todo,
     );
     final id = await dao.insertTask(initialTask);
 
@@ -47,7 +51,7 @@ void main() {
     final updatedTask = TaskEntry(
       id: id,
       title: "Tâche Mise à jour",
-      isCompleted: true,
+      status: TaskStatus.todo,
       projectId: 1,
     );
 
@@ -58,13 +62,14 @@ void main() {
     expect(result, isTrue);
     final fetched = await dao.getTasksByProject(1);
     expect(fetched.first.title, "Tâche Mise à jour");
-    expect(fetched.first.isCompleted, isTrue);
+    expect(fetched.first.status, equals(TaskStatus.todo));
   });
 
   test("doit supprimer une tâche", () async {
     final newTask = TaskEntriesCompanion.insert(
       title: "Tâche à supprimer",
       projectId: 1,
+      status: TaskStatus.todo,
     );
     final id = await dao.insertTask(newTask);
 

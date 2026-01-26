@@ -5,7 +5,7 @@ import "package:super_todo_app_mobile/features/tasks/domain/entities/task.dart";
 import "package:super_todo_app_mobile/features/tasks/domain/usecases/add_task.dart";
 import "package:super_todo_app_mobile/features/tasks/domain/usecases/delete_task.dart";
 import "package:super_todo_app_mobile/features/tasks/domain/usecases/get_tasks_by_project.dart";
-import "package:super_todo_app_mobile/features/tasks/domain/usecases/toggle_task_status.dart";
+import "package:super_todo_app_mobile/features/tasks/domain/usecases/update_task_status.dart";
 import "package:super_todo_app_mobile/features/tasks/domain/usecases/update_task.dart";
 import "package:super_todo_app_mobile/features/tasks/presentation/manager/task_provider.dart";
 
@@ -17,7 +17,7 @@ class MockUpdateTask extends Mock implements UpdateTask {}
 
 class MockDeleteTask extends Mock implements DeleteTask {}
 
-class MockToggleTask extends Mock implements ToggleTaskStatus {}
+class MockUpdateTaskStatus extends Mock implements UpdateTaskStatus {}
 
 class MockTaskUpdateError extends Mock implements TaskUpdateError {}
 
@@ -27,21 +27,21 @@ void main() {
   late MockAddTask mockAddTask;
   late MockUpdateTask mockUpdateTask;
   late MockDeleteTask mockDeleteTask;
-  late MockToggleTask mockToggleTask;
+  late MockUpdateTaskStatus mockUpdateTaskStatus;
 
   setUp(() {
     mockGetTasks = MockGetTasks();
     mockAddTask = MockAddTask();
     mockUpdateTask = MockUpdateTask();
     mockDeleteTask = MockDeleteTask();
-    mockToggleTask = MockToggleTask();
+    mockUpdateTaskStatus = MockUpdateTaskStatus();
 
     provider = TaskProvider(
       getTasksByProjectUseCase: mockGetTasks,
       addTaskUseCase: mockAddTask,
       updateTaskUseCase: mockUpdateTask,
       deleteTaskUseCase: mockDeleteTask,
-      toggleTaskStatusUseCase: mockToggleTask,
+      updateTaskStatusUseCase: mockUpdateTaskStatus,
     );
   });
 
@@ -50,7 +50,7 @@ void main() {
   });
 
   const tProjectId = 1;
-  final tTask = Task(id: 1, title: "Test Task", projectId: tProjectId, isCompleted: false);
+  final tTask = Task(id: 1, title: "Test Task", projectId: tProjectId);
 
   group("task loading", () {
     test("fetchTasks doit passer par l'état loading true puis false", () async {
@@ -117,7 +117,7 @@ void main() {
     test("doit appeler le usecase toggle avec la tâche reçue", () async {
       // Arrange
       // tTask a isCompleted: false
-      when(() => mockToggleTask.execute(any())).thenAnswer((_) async => {});
+      when(() => mockUpdateTaskStatus.execute(any())).thenAnswer((_) async => {});
       when(() => mockGetTasks.execute(any())).thenAnswer((_) async => []);
 
       // Act
@@ -126,15 +126,15 @@ void main() {
       // Assert
       // On vérifie que le provider a passé EXACTEMENT tTask au usecase
       // C'est ensuite le "vrai" usecase (pas le mock) qui fera l'inversion en prod
-      verify(() => mockToggleTask.execute(tTask)).called(1);
+      verify(() => mockUpdateTaskStatus.execute(tTask)).called(1);
     });
 
     test("toggleTaskStatus doit logger l'erreur en cas d'échec", () async {
-      when(() => mockToggleTask.execute(any())).thenThrow(Exception("Erreur Toggle"));
+      when(() => mockUpdateTaskStatus.execute(any())).thenThrow(Exception("Erreur Toggle"));
 
       await provider.toggleTaskStatus(tTask);
 
-      verify(() => mockToggleTask.execute(any())).called(1);
+      verify(() => mockUpdateTaskStatus.execute(any())).called(1);
     });
   });
 
@@ -206,7 +206,7 @@ void main() {
     test("doit émettre TaskUpdateError dans le stream lors d'un échec de toggle", () async {
       // Arrange
       final tError = MockTaskUpdateError();
-      when(() => mockToggleTask.execute(any())).thenThrow(tError);
+      when(() => mockUpdateTaskStatus.execute(any())).thenThrow(tError);
 
       // Assert: On écoute le stream AVANT l'action
       expectLater(provider.errorStream, emits(tError));

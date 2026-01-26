@@ -29,16 +29,11 @@ class TaskListItem extends StatelessWidget {
       onDismissed: (_) => onDelete(),
       child: ListTile(
         onTap: onTap,
-        leading: Checkbox(
+        /* leading: Checkbox(
           value: task.isCompleted,
           onChanged: (_) => onToggle(),
-        ),
-        title: Text(
-          task.title,
-          style: TextStyle(
-            decoration: task.isCompleted ? TextDecoration.lineThrough : null,
-          ),
-        ),
+        ), */
+        title: Text(task.title),
       ),
     );
   }

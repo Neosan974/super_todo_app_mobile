@@ -8,7 +8,7 @@ void main() {
     bool isToggled = false;
     bool isEdited = false;
     bool isDeleted = false;
-    final tTask = Task(id: 1, title: "Test Task", projectId: 1, isCompleted: false);
+    final tTask = Task(id: 1, title: "Test Task", projectId: 1);
 
     await tester.pumpWidget(
       MaterialApp(

@@ -19,6 +19,6 @@ void main() {
     expect(db.taskDao, isNotNull);
 
     // Vérifie la version du schéma (Ligne 19)
-    expect(db.schemaVersion, equals(1));
+    expect(db.schemaVersion, equals(2));
   });
 }

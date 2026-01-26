@@ -3,8 +3,7 @@
 part of 'app_database.dart';
 
 // ignore_for_file: type=lint
-class $ProjectEntriesTable extends ProjectEntries
-    with TableInfo<$ProjectEntriesTable, ProjectEntry> {
+class $ProjectEntriesTable extends ProjectEntries with TableInfo<$ProjectEntriesTable, ProjectEntry> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -156,9 +155,7 @@ class ProjectEntry extends DataClass implements Insertable<ProjectEntry> {
     return ProjectEntriesCompanion(
       id: Value(id),
       name: Value(name),
-      description: description == null && nullToAbsent
-          ? const Value.absent()
-          : Value(description),
+      description: description == null && nullToAbsent ? const Value.absent() : Value(description),
       createdAt: Value(createdAt),
     );
   }
@@ -201,9 +198,7 @@ class ProjectEntry extends DataClass implements Insertable<ProjectEntry> {
     return ProjectEntry(
       id: data.id.present ? data.id.value : this.id,
       name: data.name.present ? data.name.value : this.name,
-      description: data.description.present
-          ? data.description.value
-          : this.description,
+      description: data.description.present ? data.description.value : this.description,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
     );
   }
@@ -306,8 +301,7 @@ class ProjectEntriesCompanion extends UpdateCompanion<ProjectEntry> {
   }
 }
 
-class $TaskEntriesTable extends TaskEntries
-    with TableInfo<$TaskEntriesTable, TaskEntry> {
+class $TaskEntriesTable extends TaskEntries with TableInfo<$TaskEntriesTable, TaskEntry> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -338,21 +332,15 @@ class $TaskEntriesTable extends TaskEntries
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _isCompletedMeta = const VerificationMeta(
-    'isCompleted',
-  );
   @override
-  late final GeneratedColumn<bool> isCompleted = GeneratedColumn<bool>(
-    'is_completed',
+  late final GeneratedColumnWithTypeConverter<TaskStatus, String> status = GeneratedColumn<String>(
+    'status',
     aliasedName,
     false,
-    type: DriftSqlType.bool,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'CHECK ("is_completed" IN (0, 1))',
-    ),
-    defaultValue: const Constant(false),
-  );
+    check: () => status.isIn(TaskStatus.values.map((e) => e.name)),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  ).withConverter<TaskStatus>($TaskEntriesTable.$converterstatus);
   static const VerificationMeta _projectIdMeta = const VerificationMeta(
     'projectId',
   );
@@ -368,7 +356,7 @@ class $TaskEntriesTable extends TaskEntries
     ),
   );
   @override
-  List<GeneratedColumn> get $columns => [id, title, isCompleted, projectId];
+  List<GeneratedColumn> get $columns => [id, title, status, projectId];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -391,15 +379,6 @@ class $TaskEntriesTable extends TaskEntries
       );
     } else if (isInserting) {
       context.missing(_titleMeta);
-    }
-    if (data.containsKey('is_completed')) {
-      context.handle(
-        _isCompletedMeta,
-        isCompleted.isAcceptableOrUnknown(
-          data['is_completed']!,
-          _isCompletedMeta,
-        ),
-      );
     }
     if (data.containsKey('project_id')) {
       context.handle(
@@ -426,10 +405,12 @@ class $TaskEntriesTable extends TaskEntries
         DriftSqlType.string,
         data['${effectivePrefix}title'],
       )!,
-      isCompleted: attachedDatabase.typeMapping.read(
-        DriftSqlType.bool,
-        data['${effectivePrefix}is_completed'],
-      )!,
+      status: $TaskEntriesTable.$converterstatus.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}status'],
+        )!,
+      ),
       projectId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}project_id'],
@@ -441,17 +422,19 @@ class $TaskEntriesTable extends TaskEntries
   $TaskEntriesTable createAlias(String alias) {
     return $TaskEntriesTable(attachedDatabase, alias);
   }
+
+  static TypeConverter<TaskStatus, String> $converterstatus = const TaskStatusConverter();
 }
 
 class TaskEntry extends DataClass implements Insertable<TaskEntry> {
   final int id;
   final String title;
-  final bool isCompleted;
+  final TaskStatus status;
   final int projectId;
   const TaskEntry({
     required this.id,
     required this.title,
-    required this.isCompleted,
+    required this.status,
     required this.projectId,
   });
   @override
@@ -459,7 +442,11 @@ class TaskEntry extends DataClass implements Insertable<TaskEntry> {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['title'] = Variable<String>(title);
-    map['is_completed'] = Variable<bool>(isCompleted);
+    {
+      map['status'] = Variable<String>(
+        $TaskEntriesTable.$converterstatus.toSql(status),
+      );
+    }
     map['project_id'] = Variable<int>(projectId);
     return map;
   }
@@ -468,7 +455,7 @@ class TaskEntry extends DataClass implements Insertable<TaskEntry> {
     return TaskEntriesCompanion(
       id: Value(id),
       title: Value(title),
-      isCompleted: Value(isCompleted),
+      status: Value(status),
       projectId: Value(projectId),
     );
   }
@@ -481,7 +468,7 @@ class TaskEntry extends DataClass implements Insertable<TaskEntry> {
     return TaskEntry(
       id: serializer.fromJson<int>(json['id']),
       title: serializer.fromJson<String>(json['title']),
-      isCompleted: serializer.fromJson<bool>(json['isCompleted']),
+      status: serializer.fromJson<TaskStatus>(json['status']),
       projectId: serializer.fromJson<int>(json['projectId']),
     );
   }
@@ -491,7 +478,7 @@ class TaskEntry extends DataClass implements Insertable<TaskEntry> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'title': serializer.toJson<String>(title),
-      'isCompleted': serializer.toJson<bool>(isCompleted),
+      'status': serializer.toJson<TaskStatus>(status),
       'projectId': serializer.toJson<int>(projectId),
     };
   }
@@ -499,21 +486,19 @@ class TaskEntry extends DataClass implements Insertable<TaskEntry> {
   TaskEntry copyWith({
     int? id,
     String? title,
-    bool? isCompleted,
+    TaskStatus? status,
     int? projectId,
   }) => TaskEntry(
     id: id ?? this.id,
     title: title ?? this.title,
-    isCompleted: isCompleted ?? this.isCompleted,
+    status: status ?? this.status,
     projectId: projectId ?? this.projectId,
   );
   TaskEntry copyWithCompanion(TaskEntriesCompanion data) {
     return TaskEntry(
       id: data.id.present ? data.id.value : this.id,
       title: data.title.present ? data.title.value : this.title,
-      isCompleted: data.isCompleted.present
-          ? data.isCompleted.value
-          : this.isCompleted,
+      status: data.status.present ? data.status.value : this.status,
       projectId: data.projectId.present ? data.projectId.value : this.projectId,
     );
   }
@@ -523,52 +508,53 @@ class TaskEntry extends DataClass implements Insertable<TaskEntry> {
     return (StringBuffer('TaskEntry(')
           ..write('id: $id, ')
           ..write('title: $title, ')
-          ..write('isCompleted: $isCompleted, ')
+          ..write('status: $status, ')
           ..write('projectId: $projectId')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, title, isCompleted, projectId);
+  int get hashCode => Object.hash(id, title, status, projectId);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is TaskEntry &&
           other.id == this.id &&
           other.title == this.title &&
-          other.isCompleted == this.isCompleted &&
+          other.status == this.status &&
           other.projectId == this.projectId);
 }
 
 class TaskEntriesCompanion extends UpdateCompanion<TaskEntry> {
   final Value<int> id;
   final Value<String> title;
-  final Value<bool> isCompleted;
+  final Value<TaskStatus> status;
   final Value<int> projectId;
   const TaskEntriesCompanion({
     this.id = const Value.absent(),
     this.title = const Value.absent(),
-    this.isCompleted = const Value.absent(),
+    this.status = const Value.absent(),
     this.projectId = const Value.absent(),
   });
   TaskEntriesCompanion.insert({
     this.id = const Value.absent(),
     required String title,
-    this.isCompleted = const Value.absent(),
+    required TaskStatus status,
     required int projectId,
   }) : title = Value(title),
+       status = Value(status),
        projectId = Value(projectId);
   static Insertable<TaskEntry> custom({
     Expression<int>? id,
     Expression<String>? title,
-    Expression<bool>? isCompleted,
+    Expression<String>? status,
     Expression<int>? projectId,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (title != null) 'title': title,
-      if (isCompleted != null) 'is_completed': isCompleted,
+      if (status != null) 'status': status,
       if (projectId != null) 'project_id': projectId,
     });
   }
@@ -576,13 +562,13 @@ class TaskEntriesCompanion extends UpdateCompanion<TaskEntry> {
   TaskEntriesCompanion copyWith({
     Value<int>? id,
     Value<String>? title,
-    Value<bool>? isCompleted,
+    Value<TaskStatus>? status,
     Value<int>? projectId,
   }) {
     return TaskEntriesCompanion(
       id: id ?? this.id,
       title: title ?? this.title,
-      isCompleted: isCompleted ?? this.isCompleted,
+      status: status ?? this.status,
       projectId: projectId ?? this.projectId,
     );
   }
@@ -596,8 +582,10 @@ class TaskEntriesCompanion extends UpdateCompanion<TaskEntry> {
     if (title.present) {
       map['title'] = Variable<String>(title.value);
     }
-    if (isCompleted.present) {
-      map['is_completed'] = Variable<bool>(isCompleted.value);
+    if (status.present) {
+      map['status'] = Variable<String>(
+        $TaskEntriesTable.$converterstatus.toSql(status.value),
+      );
     }
     if (projectId.present) {
       map['project_id'] = Variable<int>(projectId.value);
@@ -610,7 +598,7 @@ class TaskEntriesCompanion extends UpdateCompanion<TaskEntry> {
     return (StringBuffer('TaskEntriesCompanion(')
           ..write('id: $id, ')
           ..write('title: $title, ')
-          ..write('isCompleted: $isCompleted, ')
+          ..write('status: $status, ')
           ..write('projectId: $projectId')
           ..write(')'))
         .toString();
@@ -625,8 +613,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final ProjectDao projectDao = ProjectDao(this as AppDatabase);
   late final TaskDao taskDao = TaskDao(this as AppDatabase);
   @override
-  Iterable<TableInfo<Table, Object?>> get allTables =>
-      allSchemaEntities.whereType<TableInfo<Table, Object?>>();
+  Iterable<TableInfo<Table, Object?>> get allTables => allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [
     projectEntries,
@@ -659,22 +646,21 @@ typedef $$ProjectEntriesTableUpdateCompanionBuilder =
       Value<DateTime> createdAt,
     });
 
-final class $$ProjectEntriesTableReferences
-    extends BaseReferences<_$AppDatabase, $ProjectEntriesTable, ProjectEntry> {
+final class $$ProjectEntriesTableReferences extends BaseReferences<_$AppDatabase, $ProjectEntriesTable, ProjectEntry> {
   $$ProjectEntriesTableReferences(
     super.$_db,
     super.$_table,
     super.$_typedResult,
   );
 
-  static MultiTypedResultKey<$TaskEntriesTable, List<TaskEntry>>
-  _taskEntriesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
-    db.taskEntries,
-    aliasName: $_aliasNameGenerator(
-      db.projectEntries.id,
-      db.taskEntries.projectId,
-    ),
-  );
+  static MultiTypedResultKey<$TaskEntriesTable, List<TaskEntry>> _taskEntriesRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.taskEntries,
+        aliasName: $_aliasNameGenerator(
+          db.projectEntries.id,
+          db.taskEntries.projectId,
+        ),
+      );
 
   $$TaskEntriesTableProcessedTableManager get taskEntriesRefs {
     final manager = $$TaskEntriesTableTableManager(
@@ -689,8 +675,7 @@ final class $$ProjectEntriesTableReferences
   }
 }
 
-class $$ProjectEntriesTableFilterComposer
-    extends Composer<_$AppDatabase, $ProjectEntriesTable> {
+class $$ProjectEntriesTableFilterComposer extends Composer<_$AppDatabase, $ProjectEntriesTable> {
   $$ProjectEntriesTableFilterComposer({
     required super.$db,
     required super.$table,
@@ -736,16 +721,14 @@ class $$ProjectEntriesTableFilterComposer
             $table: $db.taskEntries,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
           ),
     );
     return f(composer);
   }
 }
 
-class $$ProjectEntriesTableOrderingComposer
-    extends Composer<_$AppDatabase, $ProjectEntriesTable> {
+class $$ProjectEntriesTableOrderingComposer extends Composer<_$AppDatabase, $ProjectEntriesTable> {
   $$ProjectEntriesTableOrderingComposer({
     required super.$db,
     required super.$table,
@@ -774,8 +757,7 @@ class $$ProjectEntriesTableOrderingComposer
   );
 }
 
-class $$ProjectEntriesTableAnnotationComposer
-    extends Composer<_$AppDatabase, $ProjectEntriesTable> {
+class $$ProjectEntriesTableAnnotationComposer extends Composer<_$AppDatabase, $ProjectEntriesTable> {
   $$ProjectEntriesTableAnnotationComposer({
     required super.$db,
     required super.$table,
@@ -783,19 +765,16 @@ class $$ProjectEntriesTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<int> get id =>
-      $composableBuilder(column: $table.id, builder: (column) => column);
+  GeneratedColumn<int> get id => $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumn<String> get name =>
-      $composableBuilder(column: $table.name, builder: (column) => column);
+  GeneratedColumn<String> get name => $composableBuilder(column: $table.name, builder: (column) => column);
 
   GeneratedColumn<String> get description => $composableBuilder(
     column: $table.description,
     builder: (column) => column,
   );
 
-  GeneratedColumn<DateTime> get createdAt =>
-      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+  GeneratedColumn<DateTime> get createdAt => $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
   Expression<T> taskEntriesRefs<T extends Object>(
     Expression<T> Function($$TaskEntriesTableAnnotationComposer a) f,
@@ -815,8 +794,7 @@ class $$ProjectEntriesTableAnnotationComposer
             $table: $db.taskEntries,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
           ),
     );
     return f(composer);
@@ -845,12 +823,9 @@ class $$ProjectEntriesTableTableManager
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () =>
-              $$ProjectEntriesTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$ProjectEntriesTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () =>
-              $$ProjectEntriesTableAnnotationComposer($db: db, $table: table),
+          createFilteringComposer: () => $$ProjectEntriesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () => $$ProjectEntriesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () => $$ProjectEntriesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
@@ -891,20 +866,14 @@ class $$ProjectEntriesTableTableManager
               getPrefetchedDataCallback: (items) async {
                 return [
                   if (taskEntriesRefs)
-                    await $_getPrefetchedData<
-                      ProjectEntry,
-                      $ProjectEntriesTable,
-                      TaskEntry
-                    >(
+                    await $_getPrefetchedData<ProjectEntry, $ProjectEntriesTable, TaskEntry>(
                       currentTable: table,
-                      referencedTable: $$ProjectEntriesTableReferences
-                          ._taskEntriesRefsTable(db),
-                      managerFromTypedResult: (p0) =>
-                          $$ProjectEntriesTableReferences(
-                            db,
-                            table,
-                            p0,
-                          ).taskEntriesRefs,
+                      referencedTable: $$ProjectEntriesTableReferences._taskEntriesRefsTable(db),
+                      managerFromTypedResult: (p0) => $$ProjectEntriesTableReferences(
+                        db,
+                        table,
+                        p0,
+                      ).taskEntriesRefs,
                       referencedItemsForCurrentItem: (item, referencedItems) =>
                           referencedItems.where((e) => e.projectId == item.id),
                       typedResults: items,
@@ -935,25 +904,23 @@ typedef $$TaskEntriesTableCreateCompanionBuilder =
     TaskEntriesCompanion Function({
       Value<int> id,
       required String title,
-      Value<bool> isCompleted,
+      required TaskStatus status,
       required int projectId,
     });
 typedef $$TaskEntriesTableUpdateCompanionBuilder =
     TaskEntriesCompanion Function({
       Value<int> id,
       Value<String> title,
-      Value<bool> isCompleted,
+      Value<TaskStatus> status,
       Value<int> projectId,
     });
 
-final class $$TaskEntriesTableReferences
-    extends BaseReferences<_$AppDatabase, $TaskEntriesTable, TaskEntry> {
+final class $$TaskEntriesTableReferences extends BaseReferences<_$AppDatabase, $TaskEntriesTable, TaskEntry> {
   $$TaskEntriesTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
-  static $ProjectEntriesTable _projectIdTable(_$AppDatabase db) =>
-      db.projectEntries.createAlias(
-        $_aliasNameGenerator(db.taskEntries.projectId, db.projectEntries.id),
-      );
+  static $ProjectEntriesTable _projectIdTable(_$AppDatabase db) => db.projectEntries.createAlias(
+    $_aliasNameGenerator(db.taskEntries.projectId, db.projectEntries.id),
+  );
 
   $$ProjectEntriesTableProcessedTableManager get projectId {
     final $_column = $_itemColumn<int>('project_id')!;
@@ -970,8 +937,7 @@ final class $$TaskEntriesTableReferences
   }
 }
 
-class $$TaskEntriesTableFilterComposer
-    extends Composer<_$AppDatabase, $TaskEntriesTable> {
+class $$TaskEntriesTableFilterComposer extends Composer<_$AppDatabase, $TaskEntriesTable> {
   $$TaskEntriesTableFilterComposer({
     required super.$db,
     required super.$table,
@@ -989,9 +955,9 @@ class $$TaskEntriesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<bool> get isCompleted => $composableBuilder(
-    column: $table.isCompleted,
-    builder: (column) => ColumnFilters(column),
+  ColumnWithTypeConverterFilters<TaskStatus, TaskStatus, String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
   );
 
   $$ProjectEntriesTableFilterComposer get projectId {
@@ -1010,16 +976,14 @@ class $$TaskEntriesTableFilterComposer
             $table: $db.projectEntries,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
           ),
     );
     return composer;
   }
 }
 
-class $$TaskEntriesTableOrderingComposer
-    extends Composer<_$AppDatabase, $TaskEntriesTable> {
+class $$TaskEntriesTableOrderingComposer extends Composer<_$AppDatabase, $TaskEntriesTable> {
   $$TaskEntriesTableOrderingComposer({
     required super.$db,
     required super.$table,
@@ -1037,8 +1001,8 @@ class $$TaskEntriesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<bool> get isCompleted => $composableBuilder(
-    column: $table.isCompleted,
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -1058,16 +1022,14 @@ class $$TaskEntriesTableOrderingComposer
             $table: $db.projectEntries,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
           ),
     );
     return composer;
   }
 }
 
-class $$TaskEntriesTableAnnotationComposer
-    extends Composer<_$AppDatabase, $TaskEntriesTable> {
+class $$TaskEntriesTableAnnotationComposer extends Composer<_$AppDatabase, $TaskEntriesTable> {
   $$TaskEntriesTableAnnotationComposer({
     required super.$db,
     required super.$table,
@@ -1075,16 +1037,12 @@ class $$TaskEntriesTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<int> get id =>
-      $composableBuilder(column: $table.id, builder: (column) => column);
+  GeneratedColumn<int> get id => $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumn<String> get title =>
-      $composableBuilder(column: $table.title, builder: (column) => column);
+  GeneratedColumn<String> get title => $composableBuilder(column: $table.title, builder: (column) => column);
 
-  GeneratedColumn<bool> get isCompleted => $composableBuilder(
-    column: $table.isCompleted,
-    builder: (column) => column,
-  );
+  GeneratedColumnWithTypeConverter<TaskStatus, String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
 
   $$ProjectEntriesTableAnnotationComposer get projectId {
     final $$ProjectEntriesTableAnnotationComposer composer = $composerBuilder(
@@ -1102,8 +1060,7 @@ class $$TaskEntriesTableAnnotationComposer
             $table: $db.projectEntries,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
           ),
     );
     return composer;
@@ -1130,34 +1087,31 @@ class $$TaskEntriesTableTableManager
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () =>
-              $$TaskEntriesTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$TaskEntriesTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () =>
-              $$TaskEntriesTableAnnotationComposer($db: db, $table: table),
+          createFilteringComposer: () => $$TaskEntriesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () => $$TaskEntriesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () => $$TaskEntriesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
                 Value<String> title = const Value.absent(),
-                Value<bool> isCompleted = const Value.absent(),
+                Value<TaskStatus> status = const Value.absent(),
                 Value<int> projectId = const Value.absent(),
               }) => TaskEntriesCompanion(
                 id: id,
                 title: title,
-                isCompleted: isCompleted,
+                status: status,
                 projectId: projectId,
               ),
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
                 required String title,
-                Value<bool> isCompleted = const Value.absent(),
+                required TaskStatus status,
                 required int projectId,
               }) => TaskEntriesCompanion.insert(
                 id: id,
                 title: title,
-                isCompleted: isCompleted,
+                status: status,
                 projectId: projectId,
               ),
           withReferenceMapper: (p0) => p0
@@ -1193,11 +1147,8 @@ class $$TaskEntriesTableTableManager
                           state.withJoin(
                                 currentTable: table,
                                 currentColumn: table.projectId,
-                                referencedTable: $$TaskEntriesTableReferences
-                                    ._projectIdTable(db),
-                                referencedColumn: $$TaskEntriesTableReferences
-                                    ._projectIdTable(db)
-                                    .id,
+                                referencedTable: $$TaskEntriesTableReferences._projectIdTable(db),
+                                referencedColumn: $$TaskEntriesTableReferences._projectIdTable(db).id,
                               )
                               as T;
                     }
@@ -1231,8 +1182,6 @@ typedef $$TaskEntriesTableProcessedTableManager =
 class $AppDatabaseManager {
   final _$AppDatabase _db;
   $AppDatabaseManager(this._db);
-  $$ProjectEntriesTableTableManager get projectEntries =>
-      $$ProjectEntriesTableTableManager(_db, _db.projectEntries);
-  $$TaskEntriesTableTableManager get taskEntries =>
-      $$TaskEntriesTableTableManager(_db, _db.taskEntries);
+  $$ProjectEntriesTableTableManager get projectEntries => $$ProjectEntriesTableTableManager(_db, _db.projectEntries);
+  $$TaskEntriesTableTableManager get taskEntries => $$TaskEntriesTableTableManager(_db, _db.taskEntries);
 }

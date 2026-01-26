@@ -1,4 +1,5 @@
 import "package:super_todo_app_mobile/features/tasks/domain/entities/task.dart";
+import "package:super_todo_app_mobile/features/tasks/domain/entities/task_status.dart";
 import "package:super_todo_app_mobile/features/tasks/domain/repositories/task_repository.dart";
 import "package:super_todo_app_mobile/features/tasks/data/datasources/task_dao.dart";
 import "package:super_todo_app_mobile/core/database/app_database.dart";
@@ -17,7 +18,6 @@ class TaskRepositoryImpl implements TaskRepository {
           (e) => Task(
             id: e.id,
             title: e.title,
-            isCompleted: e.isCompleted,
             projectId: e.projectId,
           ),
         )
@@ -30,7 +30,7 @@ class TaskRepositoryImpl implements TaskRepository {
       TaskEntriesCompanion.insert(
         title: task.title,
         projectId: task.projectId,
-        isCompleted: Value(task.isCompleted),
+        status: TaskStatus.todo,
       ),
     );
   }
@@ -41,7 +41,6 @@ class TaskRepositoryImpl implements TaskRepository {
       TaskEntriesCompanion(
         id: Value(task.id!),
         title: Value(task.title),
-        isCompleted: Value(task.isCompleted),
         projectId: Value(task.projectId),
       ),
     );

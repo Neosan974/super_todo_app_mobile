@@ -51,7 +51,7 @@ void main() {
 
   final tProject = Project(id: 1, name: "Projet Test", createdAt: DateTime.now());
   final tTasks = [
-    Task(id: 1, title: "Tâche 1", projectId: 1, isCompleted: false),
+    Task(id: 1, title: "Tâche 1", projectId: 1),
   ];
 
   testWidgets("doit afficher un loader quand isLoading est vrai", (tester) async {

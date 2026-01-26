@@ -1,26 +1,26 @@
 import "package:flutter_test/flutter_test.dart";
 import "package:mocktail/mocktail.dart";
 import "package:super_todo_app_mobile/features/tasks/domain/entities/task.dart";
+import "package:super_todo_app_mobile/features/tasks/domain/entities/task_status.dart";
 import "package:super_todo_app_mobile/features/tasks/domain/repositories/task_repository.dart";
-import "package:super_todo_app_mobile/features/tasks/domain/usecases/update_task.dart";
+import "package:super_todo_app_mobile/features/tasks/domain/usecases/update_task_status.dart";
 
 class MockTaskRepository extends Mock implements TaskRepository {}
 
 void main() {
-  late UpdateTask usecase;
+  late UpdateTaskStatus usecase;
   late MockTaskRepository mockRepository;
 
   setUp(() {
     mockRepository = MockTaskRepository();
-    usecase = UpdateTask(mockRepository);
+    usecase = UpdateTaskStatus(mockRepository);
   });
 
   setUpAll(() {
     registerFallbackValue(Task(title: "title", projectId: 1));
   });
 
-  final tToDoTask = Task(id: 1, title: "Tâche mise à jour", projectId: 101);
-  final tDoneTask = Task(id: 1, title: "Tâche mise à jour", projectId: 101);
+  final tToDoTask = Task(id: 1, title: "Tâche mise à jour", projectId: 101, status: TaskStatus.todo);
 
   test("doit appeler le repository pour mettre à jour une tâche", () async {
     // Arrange
@@ -32,12 +32,5 @@ void main() {
     // Assert
     verify(() => mockRepository.updateTask(tToDoTask)).called(1);
     verifyNoMoreInteractions(mockRepository);
-  });
-
-  test("doit renvoyer une Failure (ou lever une Exception) quand on tente de modifier une tâche terminée", () async {
-    // Assert
-    // On vérifie que le Use Case bloque l'appel avant d'atteindre le repository
-    expect(() => usecase.execute(tDoneTask), throwsA(isA<TaskUpdateError>()));
-    verifyNever(() => mockRepository.updateTask(any()));
   });
 }

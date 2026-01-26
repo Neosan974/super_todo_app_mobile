@@ -1,13 +1,14 @@
-import "dart:io";
 import "package:drift/drift.dart";
-import "package:drift/native.dart";
+import "package:drift_flutter/drift_flutter.dart";
 import "package:path_provider/path_provider.dart";
-import "package:path/path.dart" as p;
+import "package:super_todo_app_mobile/core/database/app_database.steps.dart";
 import "package:super_todo_app_mobile/features/projects/data/datasources/project_dao.dart";
 
 import "package:super_todo_app_mobile/features/projects/data/datasources/project_table.dart";
 import "package:super_todo_app_mobile/features/tasks/data/datasources/task_dao.dart";
 import "package:super_todo_app_mobile/features/tasks/data/datasources/task_table.dart";
+import "package:super_todo_app_mobile/features/tasks/data/datasources/type_converters.dart";
+import "package:super_todo_app_mobile/features/tasks/domain/entities/task_status.dart";
 
 part "app_database.g.dart";
 
@@ -16,22 +17,35 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? e]) : super(e ?? _openConnection());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration {
+    return MigrationStrategy(
+      onCreate: (m) async {
+        await m.createAll();
+      },
+      onUpgrade: stepByStep(
+        from1To2: (m, schema) async {
+          await m.addColumn(taskEntries, schema.taskEntries.status);
+          await m.dropColumn(taskEntries, "is_completed");
+        },
+      ),
+    );
+  }
 
   // On expose le DAO pour pouvoir l'utiliser dans le Repository
   @override
   ProjectDao get projectDao => ProjectDao(this);
   @override
   TaskDao get taskDao => TaskDao(this);
-}
 
-// coverage:ignore-start
-LazyDatabase _openConnection() {
-  return LazyDatabase(() async {
-    final dbFolder = await getApplicationDocumentsDirectory();
-    final file = File(p.join(dbFolder.path, "db.sqlite"));
-    return NativeDatabase.createInBackground(file);
-  });
+  static QueryExecutor _openConnection() {
+    return driftDatabase(
+      name: "db.sqlite",
+      native: const DriftNativeOptions(
+        databaseDirectory: getApplicationSupportDirectory,
+      ),
+    );
+  }
 }
-
-// coverage:ignore-end
