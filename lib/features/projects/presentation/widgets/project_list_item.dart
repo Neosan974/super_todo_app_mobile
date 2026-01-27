@@ -16,10 +16,10 @@ class ProjectListItem extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Dismissible(
-      key: Key("project_${project.id}"),
-      onDismissed: (direction) {
+      key: projectItemKey(project.id ?? 0),
+      onDismissed: (final direction) {
         if (direction == DismissDirection.endToStart) {
           onDelete();
         }
@@ -32,4 +32,6 @@ class ProjectListItem extends StatelessWidget {
       ),
     );
   }
+
+  static Key projectItemKey(final int projectId) => Key("project_$projectId");
 }

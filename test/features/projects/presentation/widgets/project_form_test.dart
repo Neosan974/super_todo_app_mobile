@@ -3,7 +3,7 @@ import "package:flutter_test/flutter_test.dart";
 import "package:super_todo_app_mobile/features/projects/presentation/widgets/project_form.dart";
 
 void main() {
-  testWidgets("ProjectForm doit valider et soumettre le texte", (tester) async {
+  testWidgets("ProjectForm doit valider et soumettre le texte", (final tester) async {
     String? submittedName;
     String? submittedDescription;
 
@@ -11,7 +11,7 @@ void main() {
       MaterialApp(
         home: Scaffold(
           body: ProjectForm(
-            onSave: (name, description) {
+            onSave: (final name, final description) {
               submittedName = name;
               submittedDescription = description;
             },

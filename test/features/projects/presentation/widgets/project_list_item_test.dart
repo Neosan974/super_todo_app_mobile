@@ -4,7 +4,7 @@ import "package:super_todo_app_mobile/features/projects/domain/entities/project.
 import "package:super_todo_app_mobile/features/projects/presentation/widgets/project_list_item.dart";
 
 void main() {
-  testWidgets("ProjectListItem doit afficher le nom et réagir aux clics", (tester) async {
+  testWidgets("ProjectListItem doit afficher le nom et réagir aux clics", (final tester) async {
     bool isTapped = false;
     bool isEdited = false;
     bool isDeleted = false;
@@ -35,7 +35,7 @@ void main() {
     expect(isEdited, true);
 
     // Test du clic sur la poubelle
-    await tester.drag(find.byKey(Key("project_1")), Offset(-500, 0));
+    await tester.drag(find.byKey(const Key("project_1")), const Offset(-500, 0));
     await tester.pumpAndSettle();
     expect(isDeleted, true);
   });

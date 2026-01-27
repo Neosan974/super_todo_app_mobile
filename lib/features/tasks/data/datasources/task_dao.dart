@@ -9,16 +9,16 @@ class TaskDao extends DatabaseAccessor<AppDatabase> with _$TaskDaoMixin {
   TaskDao(super.db);
 
   // Récupérer toutes les tâches d'un projet
-  Future<List<TaskEntry>> getTasksByProject(int projectId) {
-    return (select(taskEntries)..where((t) => t.projectId.equals(projectId))).get();
+  Future<List<TaskEntry>> getTasksByProject(final int projectId) {
+    return (select(taskEntries)..where((final t) => t.projectId.equals(projectId))).get();
   }
 
   // Ajouter une tâche
-  Future<int> insertTask(TaskEntriesCompanion task) => into(taskEntries).insert(task);
+  Future<int> insertTask(final TaskEntriesCompanion task) => into(taskEntries).insert(task);
 
   // Mettre à jour
-  Future<bool> updateTask(TaskEntriesCompanion task) => update(taskEntries).replace(task);
+  Future<bool> updateTask(final TaskEntriesCompanion task) => update(taskEntries).replace(task);
 
   // Supprimer
-  Future<int> deleteTask(int id) => (delete(taskEntries)..where((t) => t.id.equals(id))).go();
+  Future<int> deleteTask(final int id) => (delete(taskEntries)..where((final t) => t.id.equals(id))).go();
 }

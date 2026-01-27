@@ -6,7 +6,7 @@ class GetTasksByProject {
 
   GetTasksByProject(this.repository);
 
-  Future<List<Task>> execute(int projectId) async {
+  Future<List<Task>> execute(final int projectId) async {
     return await repository.getTasksByProject(projectId);
   }
 }

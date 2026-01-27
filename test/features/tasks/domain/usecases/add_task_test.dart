@@ -16,10 +16,10 @@ void main() {
   });
 
   setUpAll(() {
-    registerFallbackValue(Task(title: "title", projectId: 1));
+    registerFallbackValue(const Task(title: "title", projectId: 1));
   });
 
-  final tTask = Task(title: "Test", projectId: 1);
+  const tTask = Task(title: "Test", projectId: 1);
 
   test("doit appeler le repository pour ajouter une tâche", () async {
     when(() => mockRepository.addTask(any())).thenAnswer((_) async => {});

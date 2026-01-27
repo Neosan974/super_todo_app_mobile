@@ -12,9 +12,9 @@ class ProjectDao extends DatabaseAccessor<AppDatabase> with _$ProjectDaoMixin {
   // Toutes tes requêtes migrent ici
   Future<List<ProjectEntry>> getAllProjects() => select(projectEntries).get();
 
-  Future<int> insertProject(ProjectEntriesCompanion entry) => into(projectEntries).insert(entry);
+  Future<int> insertProject(final ProjectEntriesCompanion entry) => into(projectEntries).insert(entry);
 
-  Future<bool> updateProject(ProjectEntriesCompanion entry) => update(projectEntries).replace(entry);
+  Future<bool> updateProject(final ProjectEntriesCompanion entry) => update(projectEntries).replace(entry);
 
-  Future deleteProjectById(int id) => (delete(projectEntries)..where((t) => t.id.equals(id))).go();
+  Future deleteProjectById(final int id) => (delete(projectEntries)..where((final t) => t.id.equals(id))).go();
 }

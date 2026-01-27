@@ -4,5 +4,5 @@ import "package:super_todo_app_mobile/features/projects/domain/repositories/proj
 class UpdateProject {
   final ProjectRepository repository;
   UpdateProject(this.repository);
-  Future<void> execute(Project project) => repository.updateProject(project);
+  Future<void> execute(final Project project) => repository.updateProject(project);
 }

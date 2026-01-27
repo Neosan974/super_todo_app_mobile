@@ -41,7 +41,7 @@ class ProjectProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> createProject(String name, String description) async {
+  Future<void> createProject(final String name, final String description) async {
     final newProject = Project(
       name: name,
       description: description,
@@ -52,12 +52,12 @@ class ProjectProvider extends ChangeNotifier {
     await fetchProjects(); // On rafraîchit la liste après l'ajout
   }
 
-  Future<void> editProject(Project project) async {
+  Future<void> editProject(final Project project) async {
     await updateProjectUseCase.execute(project);
     await fetchProjects(); // Rafraîchissement
   }
 
-  Future<void> removeProject(int id) async {
+  Future<void> removeProject(final int id) async {
     await deleteProjectUseCase.execute(id);
     await fetchProjects(); // Rafraîchissement
   }

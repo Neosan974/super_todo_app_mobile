@@ -5,8 +5,8 @@ class TaskStatusConverter extends TypeConverter<TaskStatus, String> {
   const TaskStatusConverter();
 
   @override
-  TaskStatus fromSql(String fromDb) => TaskStatus.values.byName(fromDb);
+  TaskStatus fromSql(final String fromDb) => TaskStatus.values.byName(fromDb);
 
   @override
-  String toSql(TaskStatus value) => value.name;
+  String toSql(final TaskStatus value) => value.name;
 }

@@ -1,19 +1,14 @@
 import "package:flutter/material.dart";
 
 enum TaskStatus {
-  todo,
-  inProgress,
-  done
+  todo(label: "Todo"),
+  inProgress(label: "In Progress"),
+  done(label: "Done")
   ;
 
-  Widget get displayWidget {
-    switch (this) {
-      case TaskStatus.todo:
-        return const Chip(label: Text("Todo"));
-      case TaskStatus.inProgress:
-        return const Chip(label: Text("In Progress"));
-      case TaskStatus.done:
-        return const Chip(label: Text("Done"));
-    }
-  }
+  final String label;
+
+  const TaskStatus({required this.label});
+
+  Widget get displayWidget => Chip(label: Text(label));
 }

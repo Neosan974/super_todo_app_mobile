@@ -35,7 +35,7 @@ class _ProjectFormState extends State<ProjectForm> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [

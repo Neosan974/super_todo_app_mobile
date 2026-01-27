@@ -19,7 +19,7 @@ class TaskListItem extends StatelessWidget {
   @override
   Widget build(final BuildContext context) {
     return Dismissible(
-      key: Key("task_${task.id}"),
+      key: taskItemKey(task.id ?? 0),
       direction: DismissDirection.endToStart,
       background: Container(
         color: Colors.red,
@@ -39,7 +39,7 @@ class TaskListItem extends StatelessWidget {
               .map(
                 (final e) => DropdownMenuEntry(
                   value: e,
-                  label: e.name,
+                  label: e.label,
                   labelWidget: e.displayWidget,
                 ),
               )
@@ -49,4 +49,6 @@ class TaskListItem extends StatelessWidget {
       ),
     );
   }
+
+  static Key taskItemKey(final int taskId) => Key("task_$taskId");
 }

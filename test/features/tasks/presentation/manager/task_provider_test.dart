@@ -46,11 +46,11 @@ void main() {
   });
 
   setUpAll(() {
-    registerFallbackValue(Task(title: "title", projectId: 1));
+    registerFallbackValue(const Task(title: "title", projectId: 1));
   });
 
   const tProjectId = 1;
-  final tTask = Task(id: 1, title: "Test Task", projectId: tProjectId);
+  const tTask = Task(id: 1, title: "Test Task", projectId: tProjectId);
 
   group("task loading", () {
     test("fetchTasks doit passer par l'état loading true puis false", () async {
@@ -149,7 +149,7 @@ void main() {
 
       // Assert
       verify(
-        () => mockUpdateTask.execute(any(that: isA<Task>().having((t) => t.title, "title", "Nouveau Titre"))),
+        () => mockUpdateTask.execute(any(that: isA<Task>().having((final t) => t.title, "title", "Nouveau Titre"))),
       ).called(1);
     });
 

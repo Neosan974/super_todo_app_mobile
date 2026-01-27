@@ -42,7 +42,7 @@ class TaskProvider extends ChangeNotifier {
     super.dispose();
   }
 
-  Future<void> fetchTasks(int projectId) async {
+  Future<void> fetchTasks(final int projectId) async {
     _isLoading = true;
     notifyListeners();
 
@@ -57,7 +57,7 @@ class TaskProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> addTask(String title, int projectId) async {
+  Future<void> addTask(final String title, final int projectId) async {
     final newTask = Task(title: title, projectId: projectId);
 
     try {
@@ -69,7 +69,7 @@ class TaskProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> updateTaskStatus(Task task) async {
+  Future<void> updateTaskStatus(final Task task) async {
     try {
       // On utilise le use case dédié qui n'a pas la restriction de verrouillage
       await updateTaskStatusUseCase.execute(task);
@@ -83,7 +83,7 @@ class TaskProvider extends ChangeNotifier {
   }
 
   // Supprimer une tâche
-  Future<void> removeTask(int taskId, int projectId) async {
+  Future<void> removeTask(final int taskId, final int projectId) async {
     try {
       await deleteTaskUseCase.execute(taskId);
       await fetchTasks(projectId);
@@ -93,7 +93,7 @@ class TaskProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> renameTask(Task task, String newTitle) async {
+  Future<void> renameTask(final Task task, final String newTitle) async {
     if (newTitle.isEmpty || newTitle == task.title) return;
 
     final updatedTask = task.copyWith(title: newTitle);

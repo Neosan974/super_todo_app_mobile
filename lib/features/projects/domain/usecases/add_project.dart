@@ -6,7 +6,7 @@ class AddProject {
 
   AddProject(this.repository);
 
-  Future<void> execute(Project project) async {
+  Future<void> execute(final Project project) async {
     // On pourrait ajouter une validation ici
     if (project.name.isEmpty) return;
 

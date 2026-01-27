@@ -17,7 +17,7 @@ void main() {
 
   const tProjectId = 1;
   final tTasks = [
-    Task(id: 1, title: "Test Task", projectId: tProjectId),
+    const Task(id: 1, title: "Test Task", projectId: tProjectId),
   ];
 
   test("doit récupérer les tâches du repository pour un projet donné", () async {

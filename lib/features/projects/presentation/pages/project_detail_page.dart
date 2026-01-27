@@ -11,7 +11,7 @@ import "package:super_todo_app_mobile/features/tasks/presentation/widgets/task_l
 class ProjectDetailPage extends StatefulWidget {
   final Project project;
 
-  static final newTaskButtonKey = Key("new_task_button");
+  static const newTaskButtonKey = Key("new_task_button");
 
   const ProjectDetailPage({super.key, required this.project});
 
@@ -31,7 +31,7 @@ class _ProjectDetailPageState extends State<ProjectDetailPage> {
     });
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _errorSubscription = context.read<TaskProvider>().errorStream.listen((error) {
+      _errorSubscription = context.read<TaskProvider>().errorStream.listen((final error) {
         if (!mounted) return;
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -51,14 +51,14 @@ class _ProjectDetailPageState extends State<ProjectDetailPage> {
     super.dispose();
   }
 
-  void _showTaskDialog(BuildContext context, {Task? taskToEdit}) {
+  void _showTaskDialog(final BuildContext context, {final Task? taskToEdit}) {
     showDialog(
       context: context,
-      builder: (dialogContext) => AlertDialog(
+      builder: (final dialogContext) => AlertDialog(
         title: Text(taskToEdit == null ? "Nouvelle tâche" : "Modifier la tâche"),
         content: TaskForm(
           initialTitle: taskToEdit?.title,
-          onSave: (newTitle) async {
+          onSave: (final newTitle) async {
             final provider = context.read<TaskProvider>(); // On utilise le context de la page
 
             if (taskToEdit == null) {
@@ -77,11 +77,11 @@ class _ProjectDetailPageState extends State<ProjectDetailPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(widget.project.name)),
       body: Consumer<TaskProvider>(
-        builder: (context, provider, child) {
+        builder: (final context, final provider, final child) {
           if (provider.isLoading) return const Center(child: CircularProgressIndicator());
 
           if (provider.tasks.isEmpty) {
@@ -90,11 +90,11 @@ class _ProjectDetailPageState extends State<ProjectDetailPage> {
 
           return ListView.builder(
             itemCount: provider.tasks.length,
-            itemBuilder: (context, index) {
+            itemBuilder: (final context, final index) {
               final task = provider.tasks[index];
               return TaskListItem(
                 task: task,
-                onStatusChange: (newStatus) async {
+                onStatusChange: (final newStatus) async {
                   await provider.updateTaskStatus(task.copyWith(status: newStatus));
                 },
                 onDelete: () => provider.removeTask(task.id!, widget.project.id!),

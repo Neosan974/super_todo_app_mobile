@@ -19,10 +19,10 @@ class Task extends Equatable {
 
   // Optionnel : un helper pour copier l'objet avec des modifications (utile pour le toggle)
   Task copyWith({
-    int? id,
-    String? title,
-    int? projectId,
-    TaskStatus? status,
+    final int? id,
+    final String? title,
+    final int? projectId,
+    final TaskStatus? status,
   }) {
     return Task(
       id: id ?? this.id,

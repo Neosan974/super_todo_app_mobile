@@ -19,7 +19,7 @@ void main() {
     status: TaskStatus.todo,
     projectId: tProjectId,
   );
-  final tTaskEntity = Task(
+  const tTaskEntity = Task(
     id: 1,
     title: "Test Task",
     projectId: tProjectId,
@@ -31,12 +31,12 @@ void main() {
   });
 
   setUpAll(() {
-    registerFallbackValue(TaskEntriesCompanion());
+    registerFallbackValue(const TaskEntriesCompanion());
   });
 
   test("addTask doit appeler le DAO avec les bonnes données", () async {
     // Arrange
-    final tTask = Task(title: "New Task", projectId: 1);
+    const tTask = Task(title: "New Task", projectId: 1);
     when(() => mockTaskDao.insertTask(any())).thenAnswer((_) async => 1);
 
     // Act

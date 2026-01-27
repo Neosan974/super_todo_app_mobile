@@ -9,7 +9,7 @@ import "package:super_todo_app_mobile/features/projects/presentation/widgets/pro
 class ProjectListPage extends StatefulWidget {
   const ProjectListPage({super.key});
 
-  static final newProjectButtonKey = Key("new_project_button");
+  static const newProjectButtonKey = Key("new_project_button");
 
   @override
   State<ProjectListPage> createState() => _ProjectListPageState();
@@ -25,14 +25,14 @@ class _ProjectListPageState extends State<ProjectListPage> {
     });
   }
 
-  void _showProjectDialog(BuildContext context, {Project? project}) {
+  void _showProjectDialog(final BuildContext context, {final Project? project}) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (final context) => AlertDialog(
         title: Text(project == null ? "Nouveau Projet" : "Modifier le projet"),
         content: ProjectForm(
           project: project,
-          onSave: (name, description) {
+          onSave: (final name, final description) {
             final provider = context.read<ProjectProvider>();
 
             if (project == null) {
@@ -57,13 +57,13 @@ class _ProjectListPageState extends State<ProjectListPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final provider = context.watch<ProjectProvider>();
 
     return Scaffold(
       appBar: AppBar(title: const Text("Mes Projets")),
       body: Builder(
-        builder: (context) {
+        builder: (final context) {
           if (provider.isLoading) {
             return const Center(child: CircularProgressIndicator());
           }
@@ -72,7 +72,7 @@ class _ProjectListPageState extends State<ProjectListPage> {
           }
           return ListView.builder(
             itemCount: provider.projects.length,
-            itemBuilder: (context, index) {
+            itemBuilder: (final context, final index) {
               final project = provider.projects[index];
 
               return ProjectListItem(
@@ -81,7 +81,7 @@ class _ProjectListPageState extends State<ProjectListPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => ProjectDetailPage(project: project),
+                      builder: (final context) => ProjectDetailPage(project: project),
                     ),
                   );
                 },

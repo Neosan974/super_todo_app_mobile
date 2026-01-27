@@ -16,7 +16,7 @@ class ProjectRepositoryImpl implements ProjectRepository {
     // On convertit les lignes Drift (ProjectEntry) en nos Entités (Project)
     return rows
         .map(
-          (row) => Project(
+          (final row) => Project(
             id: row.id,
             name: row.name,
             description: row.description,
@@ -27,7 +27,7 @@ class ProjectRepositoryImpl implements ProjectRepository {
   }
 
   @override
-  Future<void> addProject(Project project) async {
+  Future<void> addProject(final Project project) async {
     // Drift utilise des "Companions" pour les insertions (pour gérer l'id auto-incrémenté)
     await projectDao.insertProject(
       ProjectEntriesCompanion(
@@ -39,7 +39,7 @@ class ProjectRepositoryImpl implements ProjectRepository {
   }
 
   @override
-  Future<void> updateProject(Project project) async {
+  Future<void> updateProject(final Project project) async {
     await projectDao.updateProject(
       ProjectEntriesCompanion(
         id: Value(project.id!),
@@ -50,7 +50,7 @@ class ProjectRepositoryImpl implements ProjectRepository {
   }
 
   @override
-  Future<void> deleteProject(int id) async {
+  Future<void> deleteProject(final int id) async {
     await projectDao.deleteProjectById(id);
   }
 }

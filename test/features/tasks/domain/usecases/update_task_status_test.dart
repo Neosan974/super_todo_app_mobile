@@ -17,10 +17,10 @@ void main() {
   });
 
   setUpAll(() {
-    registerFallbackValue(Task(title: "title", projectId: 1));
+    registerFallbackValue(const Task(title: "title", projectId: 1));
   });
 
-  final tToDoTask = Task(id: 1, title: "Tâche mise à jour", projectId: 101, status: TaskStatus.todo);
+  const tToDoTask = Task(id: 1, title: "Tâche mise à jour", projectId: 101, status: TaskStatus.todo);
 
   test("doit appeler le repository pour mettre à jour une tâche", () async {
     // Arrange

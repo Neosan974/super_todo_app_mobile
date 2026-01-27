@@ -16,7 +16,7 @@ import "package:super_todo_app_mobile/features/tasks/domain/usecases/update_task
 
 final sl = GetIt.instance; // sl pour Service Locator
 
-Future<void> init({AppDatabase? database}) async {
+Future<void> init({final AppDatabase? database}) async {
   // 1. Base de données & DAOs
   final db = database ?? AppDatabase();
   sl.registerSingleton(db);

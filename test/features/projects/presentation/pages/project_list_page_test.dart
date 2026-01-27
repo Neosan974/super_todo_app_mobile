@@ -49,7 +49,7 @@ void main() {
     registerFallbackValue(Project(name: "", createdAt: DateTime.now()));
   });
 
-  testWidgets("doit afficher un loader quand le provider charge", (WidgetTester tester) async {
+  testWidgets("doit afficher un loader quand le provider charge", (final WidgetTester tester) async {
     // On crée un mock du provider ou on injecte un état spécifique
     when(() => mockProjectProvider.isLoading).thenReturn(true);
     when(() => mockProjectProvider.projects).thenReturn([]);
@@ -68,7 +68,7 @@ void main() {
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
   });
 
-  testWidgets("doit naviguer vers le détail du projet lors d'un clic", (tester) async {
+  testWidgets("doit naviguer vers le détail du projet lors d'un clic", (final tester) async {
     final tProject = Project(id: 1, name: "Projet Test", createdAt: DateTime.now());
     when(() => mockProjectProvider.projects).thenReturn([tProject]);
 
@@ -83,7 +83,7 @@ void main() {
     expect(find.byType(ProjectDetailPage), findsOneWidget);
   });
 
-  testWidgets("doit ouvrir le dialogue et créer un projet", (tester) async {
+  testWidgets("doit ouvrir le dialogue et créer un projet", (final tester) async {
     when(() => mockProjectProvider.projects).thenReturn([]);
     when(() => mockProjectProvider.createProject(any(), any())).thenAnswer((_) async => {});
 
@@ -106,7 +106,7 @@ void main() {
     verify(() => mockProjectProvider.createProject("Nouveau Projet", "Nouvelle description Projet")).called(1);
   });
 
-  testWidgets("doit ouvrir le dialogue en mode édition et modifier le projet", (tester) async {
+  testWidgets("doit ouvrir le dialogue en mode édition et modifier le projet", (final tester) async {
     // 1. On prépare un projet existant
     final tProject = Project(id: 1, name: "Ancien Nom", createdAt: DateTime.now());
 
@@ -134,15 +134,15 @@ void main() {
       () => mockProjectProvider.editProject(
         any(
           that: isA<Project>()
-              .having((p) => p.id, "id", 1)
-              .having((p) => p.name, "name", "Nom Modifié")
-              .having((p) => p.description, "description", "Description"),
+              .having((final p) => p.id, "id", 1)
+              .having((final p) => p.name, "name", "Nom Modifié")
+              .having((final p) => p.description, "description", "Description"),
         ),
       ),
     ).called(1);
   });
 
-  testWidgets("doit supprimer un projet lors du drag vers la gauche de celui-ci", (tester) async {
+  testWidgets("doit supprimer un projet lors du drag vers la gauche de celui-ci", (final tester) async {
     final tProject = Project(id: 1, name: "Projet Test", createdAt: DateTime.now());
     when(() => mockProjectProvider.projects).thenReturn([tProject]);
     when(() => mockProjectProvider.removeProject(any())).thenAnswer((_) async => {});
@@ -151,7 +151,7 @@ void main() {
     await tester.pump();
 
     // Clique sur l'icône de suppression (Ligne 86)
-    await tester.drag(find.byKey(Key("project_1")), Offset(-500, 0));
+    await tester.drag(find.byKey(const Key("project_1")), const Offset(-500, 0));
     await tester.pumpAndSettle();
 
     // Vérifie l'appel (Ligne 87)

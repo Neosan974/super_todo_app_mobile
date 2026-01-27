@@ -4,8 +4,8 @@ import "package:super_todo_app_mobile/features/tasks/domain/entities/task_status
 
 void main() {
   group("Task Entity", () {
-    final tTask1 = Task(id: 1, title: "test", projectId: 1, status: TaskStatus.todo);
-    final tTask2 = Task(id: 1, title: "test", projectId: 1, status: TaskStatus.todo);
+    const tTask1 = Task(id: 1, title: "test", projectId: 1, status: TaskStatus.todo);
+    const tTask2 = Task(id: 1, title: "test", projectId: 1, status: TaskStatus.todo);
     // final tTask3 = Task(id: 2, title: "test bis", projectId: 1);
 
     test("doit supporter la comparaison par valeur (Equatable)", () {

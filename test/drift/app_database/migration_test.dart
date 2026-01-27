@@ -60,11 +60,11 @@ void main() {
       createOld: v1.DatabaseAtV1.new,
       createNew: v2.DatabaseAtV2.new,
       openTestedDatabase: AppDatabase.new,
-      createItems: (batch, oldDb) {
+      createItems: (final batch, final oldDb) {
         batch.insertAll(oldDb.projectEntries, oldProjectEntriesData);
         batch.insertAll(oldDb.taskEntries, oldTaskEntriesData);
       },
-      validateItems: (newDb) async {
+      validateItems: (final newDb) async {
         expect(
           expectedNewProjectEntriesData,
           await newDb.select(newDb.projectEntries).get(),

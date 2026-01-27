@@ -7,7 +7,7 @@ class TaskEntries extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get title => text().withLength(min: 1, max: 100)();
   TextColumn get status =>
-      text().map(const TaskStatusConverter()).check(status.isIn(TaskStatus.values.map((e) => e.name)))();
+      text().map(const TaskStatusConverter()).check(status.isIn(TaskStatus.values.map((final e) => e.name)))();
 
   // La clé étrangère vers le projet
   IntColumn get projectId => integer().references(

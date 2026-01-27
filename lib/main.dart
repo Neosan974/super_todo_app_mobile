@@ -6,7 +6,7 @@ import "package:super_todo_app_mobile/features/projects/presentation/manager/pro
 import "package:super_todo_app_mobile/features/projects/presentation/pages/project_list_page.dart";
 import "package:super_todo_app_mobile/features/tasks/presentation/manager/task_provider.dart";
 
-void main({AppDatabase? db}) async {
+void main({final AppDatabase? db}) async {
   // 1. Indispensable pour initialiser les plugins (SQLite/PathProvider)
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return MultiProvider(
       providers: [
         // 3. On injecte le Provider au sommet de l'arbre.

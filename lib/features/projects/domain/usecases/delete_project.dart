@@ -3,5 +3,5 @@ import "package:super_todo_app_mobile/features/projects/domain/repositories/proj
 class DeleteProject {
   final ProjectRepository repository;
   DeleteProject(this.repository);
-  Future<void> execute(int id) => repository.deleteProject(id);
+  Future<void> execute(final int id) => repository.deleteProject(id);
 }

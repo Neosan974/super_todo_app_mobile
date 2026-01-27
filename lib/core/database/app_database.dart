@@ -14,7 +14,7 @@ part "app_database.g.dart";
 
 @DriftDatabase(tables: [ProjectEntries, TaskEntries], daos: [ProjectDao, TaskDao])
 class AppDatabase extends _$AppDatabase {
-  AppDatabase([QueryExecutor? e]) : super(e ?? _openConnection());
+  AppDatabase([final QueryExecutor? e]) : super(e ?? _openConnection());
 
   @override
   int get schemaVersion => 2;
@@ -22,11 +22,11 @@ class AppDatabase extends _$AppDatabase {
   @override
   MigrationStrategy get migration {
     return MigrationStrategy(
-      onCreate: (m) async {
+      onCreate: (final m) async {
         await m.createAll();
       },
       onUpgrade: stepByStep(
-        from1To2: (m, schema) async {
+        from1To2: (final m, final schema) async {
           await m.addColumn(taskEntries, schema.taskEntries.status);
           await m.dropColumn(taskEntries, "is_completed");
         },
