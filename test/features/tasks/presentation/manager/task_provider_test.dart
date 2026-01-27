@@ -121,7 +121,7 @@ void main() {
       when(() => mockGetTasks.execute(any())).thenAnswer((_) async => []);
 
       // Act
-      await provider.toggleTaskStatus(tTask);
+      await provider.updateTaskStatus(tTask);
 
       // Assert
       // On vérifie que le provider a passé EXACTEMENT tTask au usecase
@@ -132,7 +132,7 @@ void main() {
     test("toggleTaskStatus doit logger l'erreur en cas d'échec", () async {
       when(() => mockUpdateTaskStatus.execute(any())).thenThrow(Exception("Erreur Toggle"));
 
-      await provider.toggleTaskStatus(tTask);
+      await provider.updateTaskStatus(tTask);
 
       verify(() => mockUpdateTaskStatus.execute(any())).called(1);
     });
@@ -212,7 +212,7 @@ void main() {
       expectLater(provider.errorStream, emits(tError));
 
       // Act
-      await provider.toggleTaskStatus(tTask);
+      await provider.updateTaskStatus(tTask);
     });
 
     test("doit émettre TaskUpdateError dans le stream lors d'un échec de renommage", () async {

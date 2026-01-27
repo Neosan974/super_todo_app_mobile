@@ -1,6 +1,7 @@
 import "package:flutter_test/flutter_test.dart";
 import "package:mocktail/mocktail.dart";
 import "package:super_todo_app_mobile/features/tasks/domain/entities/task.dart";
+import "package:super_todo_app_mobile/features/tasks/domain/entities/task_status.dart";
 import "package:super_todo_app_mobile/features/tasks/domain/repositories/task_repository.dart";
 import "package:super_todo_app_mobile/features/tasks/domain/usecases/update_task.dart";
 
@@ -16,11 +17,11 @@ void main() {
   });
 
   setUpAll(() {
-    registerFallbackValue(Task(title: "title", projectId: 1));
+    registerFallbackValue(const Task(title: "title", projectId: 1));
   });
 
-  final tToDoTask = Task(id: 1, title: "Tâche mise à jour", projectId: 101);
-  final tDoneTask = Task(id: 1, title: "Tâche mise à jour", projectId: 101);
+  const tToDoTask = Task(id: 1, title: "Tâche mise à jour", projectId: 101);
+  const tDoneTask = Task(id: 1, title: "Tâche mise à jour", projectId: 101, status: TaskStatus.done);
 
   test("doit appeler le repository pour mettre à jour une tâche", () async {
     // Arrange

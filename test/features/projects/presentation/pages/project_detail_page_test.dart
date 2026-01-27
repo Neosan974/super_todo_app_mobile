@@ -9,6 +9,7 @@ import "package:super_todo_app_mobile/core/errors/unknown_error.dart";
 import "package:super_todo_app_mobile/features/projects/domain/entities/project.dart";
 import "package:super_todo_app_mobile/features/projects/presentation/pages/project_detail_page.dart";
 import "package:super_todo_app_mobile/features/tasks/domain/entities/task.dart";
+import "package:super_todo_app_mobile/features/tasks/domain/entities/task_status.dart";
 import "package:super_todo_app_mobile/features/tasks/domain/usecases/update_task.dart";
 import "package:super_todo_app_mobile/features/tasks/presentation/manager/task_provider.dart";
 import "package:super_todo_app_mobile/features/tasks/presentation/widgets/task_form.dart";
@@ -35,11 +36,11 @@ void main() {
   });
 
   setUpAll(() {
-    registerFallbackValue(Task(title: "title", projectId: 1));
+    registerFallbackValue(const Task(title: "title", projectId: 1));
   });
 
   // Helper pour injecter le provider dans l'arbre de widgets du test
-  Widget createWidgetUnderTest(Project project) {
+  Widget createWidgetUnderTest(final Project project) {
     return MaterialApp(
       // On enveloppe TOUTE l'app pour que les dialogues y aient accès
       home: ChangeNotifierProvider<TaskProvider>.value(
@@ -51,10 +52,10 @@ void main() {
 
   final tProject = Project(id: 1, name: "Projet Test", createdAt: DateTime.now());
   final tTasks = [
-    Task(id: 1, title: "Tâche 1", projectId: 1),
+    const Task(id: 1, title: "Tâche 1", projectId: 1),
   ];
 
-  testWidgets("doit afficher un loader quand isLoading est vrai", (tester) async {
+  testWidgets("doit afficher un loader quand isLoading est vrai", (final tester) async {
     // Arrange
     when(() => mockProvider.isLoading).thenReturn(true);
     when(() => mockProvider.tasks).thenReturn([]);
@@ -68,7 +69,7 @@ void main() {
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
   });
 
-  testWidgets("doit afficher la liste des tâches quand elles sont chargées", (tester) async {
+  testWidgets("doit afficher la liste des tâches quand elles sont chargées", (final tester) async {
     // Arrange
     when(() => mockProvider.isLoading).thenReturn(false);
     when(() => mockProvider.tasks).thenReturn(tTasks);
@@ -80,10 +81,10 @@ void main() {
 
     // Assert
     expect(find.text("Tâche 1"), findsOneWidget);
-    expect(find.byType(Checkbox), findsOneWidget);
+    expect(find.byType(DropdownMenu<TaskStatus>), findsOneWidget);
   });
 
-  testWidgets("doit ouvrir le dialogue d'ajout et appeler addTask via les Keys", (tester) async {
+  testWidgets("doit ouvrir le dialogue d'ajout et appeler addTask via les Keys", (final tester) async {
     // ... mocks habituels ...
 
     await tester.pumpWidget(createWidgetUnderTest(tProject));
@@ -100,7 +101,7 @@ void main() {
     verify(() => mockProvider.addTask("Ma nouvelle tâche", tProject.id!)).called(1);
   });
 
-  testWidgets("doit ouvrir le dialogue de modification au clic sur une tâche", (tester) async {
+  testWidgets("doit ouvrir le dialogue de modification au clic sur une tâche", (final tester) async {
     // Arrange
     when(() => mockProvider.isLoading).thenReturn(false);
     when(() => mockProvider.tasks).thenReturn(tTasks);
@@ -118,7 +119,7 @@ void main() {
     expect(find.text("Modifier la tâche"), findsOneWidget);
 
     // 3. Modifier le texte et enregistrer
-    await tester.enterText(find.byType(TextField), "Tâche modifiée");
+    await tester.enterText(find.byKey(TaskForm.textFieldKey), "Tâche modifiée");
     await tester.tap(find.text("Enregistrer"));
     await tester.pumpAndSettle();
 
@@ -126,25 +127,29 @@ void main() {
     verify(() => mockProvider.renameTask(tTasks[0], "Tâche modifiée")).called(1);
   });
 
-  testWidgets("doit appeler toggleTaskStatus lors du clic sur la checkbox", (tester) async {
+  testWidgets("doit appeler updateTaskStatus lors de la sélection d'un nouveau status", (final tester) async {
     // Arrange
     when(() => mockProvider.isLoading).thenReturn(false);
     when(() => mockProvider.tasks).thenReturn(tTasks);
     when(() => mockProvider.fetchTasks(any())).thenAnswer((_) async => {});
-    when(() => mockProvider.toggleTaskStatus(any())).thenAnswer((_) async => {});
+    when(() => mockProvider.updateTaskStatus(any())).thenAnswer((_) async => {});
 
     await tester.pumpWidget(createWidgetUnderTest(tProject));
     await tester.pump();
 
     // Act
-    await tester.tap(find.byType(Checkbox));
-    await tester.pump();
+    await tester.tap(find.byType(DropdownMenu<TaskStatus>));
+    await tester.pumpAndSettle();
+
+    // Taper sur le texte 'In Progress' qui est dans le Chip d'une DropdownMenuEntry
+    await tester.tap(find.text("In Progress").last);
+    await tester.pumpAndSettle();
 
     // Assert
-    verify(() => mockProvider.toggleTaskStatus(tTasks[0])).called(1);
+    verify(() => mockProvider.updateTaskStatus(tTasks[0].copyWith(status: TaskStatus.inProgress))).called(1);
   });
 
-  testWidgets("doit supprimer une tâche lors d'un swipe vers la gauche", (tester) async {
+  testWidgets("doit supprimer une tâche lors d'un swipe vers la gauche", (final tester) async {
     when(() => mockProvider.isLoading).thenReturn(false);
     when(() => mockProvider.tasks).thenReturn(tTasks);
     when(() => mockProvider.fetchTasks(any())).thenAnswer((_) async => {});
@@ -163,7 +168,7 @@ void main() {
     verify(() => mockProvider.removeTask(tTasks[0].id!, tProject.id!)).called(1);
   });
 
-  testWidgets("doit afficher une SnackBar rouge quand une erreur survient", (tester) async {
+  testWidgets("doit afficher une SnackBar rouge quand une erreur survient", (final tester) async {
     final errorController = StreamController<AppError>();
     // On remplace le stream vide par notre controller pour ce test précis
     when(() => mockProvider.errorStream).thenAnswer((_) => errorController.stream);
@@ -183,7 +188,7 @@ void main() {
     errorController.close();
   });
 
-  testWidgets("doit afficher le message précis de TaskUpdateError", (tester) async {
+  testWidgets("doit afficher le message précis de TaskUpdateError", (final tester) async {
     final errorController = StreamController<AppError>();
     when(() => mockProvider.errorStream).thenAnswer((_) => errorController.stream);
 
@@ -203,7 +208,7 @@ void main() {
     errorController.close();
   });
 
-  testWidgets("doit afficher un message générique pour une UnknownError", (tester) async {
+  testWidgets("doit afficher un message générique pour une UnknownError", (final tester) async {
     final errorController = StreamController<AppError>();
     when(() => mockProvider.errorStream).thenAnswer((_) => errorController.stream);
 
@@ -221,7 +226,7 @@ void main() {
     errorController.close();
   });
 
-  testWidgets("doit annuler l'abonnement au stream lors du dispose", (tester) async {
+  testWidgets("doit annuler l'abonnement au stream lors du dispose", (final tester) async {
     final errorController = StreamController<AppError>();
     when(() => mockProvider.errorStream).thenAnswer((_) => errorController.stream);
 

@@ -94,8 +94,8 @@ class _ProjectDetailPageState extends State<ProjectDetailPage> {
               final task = provider.tasks[index];
               return TaskListItem(
                 task: task,
-                onToggle: () async {
-                  await provider.toggleTaskStatus(task);
+                onStatusChange: (newStatus) async {
+                  await provider.updateTaskStatus(task.copyWith(status: newStatus));
                 },
                 onDelete: () => provider.removeTask(task.id!, widget.project.id!),
                 onTap: () => _showTaskDialog(context, taskToEdit: task),

@@ -11,11 +11,11 @@ class TaskRepositoryImpl implements TaskRepository {
   TaskRepositoryImpl(this.taskDao);
 
   @override
-  Future<List<Task>> getTasksByProject(int projectId) async {
+  Future<List<Task>> getTasksByProject(final int projectId) async {
     final entries = await taskDao.getTasksByProject(projectId);
     return entries
         .map(
-          (e) => Task(
+          (final e) => Task(
             id: e.id,
             title: e.title,
             projectId: e.projectId,
@@ -25,7 +25,7 @@ class TaskRepositoryImpl implements TaskRepository {
   }
 
   @override
-  Future<void> addTask(Task task) async {
+  Future<void> addTask(final Task task) async {
     await taskDao.insertTask(
       TaskEntriesCompanion.insert(
         title: task.title,
@@ -36,7 +36,7 @@ class TaskRepositoryImpl implements TaskRepository {
   }
 
   @override
-  Future<void> updateTask(Task task) async {
+  Future<void> updateTask(final Task task) async {
     await taskDao.updateTask(
       TaskEntriesCompanion(
         id: Value(task.id!),
@@ -47,7 +47,7 @@ class TaskRepositoryImpl implements TaskRepository {
   }
 
   @override
-  Future<void> deleteTask(int taskId) async {
+  Future<void> deleteTask(final int taskId) async {
     await taskDao.deleteTask(taskId);
   }
 }

@@ -1,22 +1,23 @@
 import "package:flutter/material.dart";
 import "package:super_todo_app_mobile/features/tasks/domain/entities/task.dart";
+import "package:super_todo_app_mobile/features/tasks/domain/entities/task_status.dart";
 
 class TaskListItem extends StatelessWidget {
   final Task task;
-  final VoidCallback onToggle;
-  final VoidCallback onDelete;
-  final VoidCallback onTap;
+  final void Function(TaskStatus?) onStatusChange;
+  final void Function() onDelete;
+  final void Function() onTap;
 
   const TaskListItem({
     super.key,
     required this.task,
-    required this.onToggle,
+    required this.onStatusChange,
     required this.onDelete,
     required this.onTap,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Dismissible(
       key: Key("task_${task.id}"),
       direction: DismissDirection.endToStart,
@@ -29,10 +30,21 @@ class TaskListItem extends StatelessWidget {
       onDismissed: (_) => onDelete(),
       child: ListTile(
         onTap: onTap,
-        /* leading: Checkbox(
-          value: task.isCompleted,
-          onChanged: (_) => onToggle(),
-        ), */
+        leading: DropdownMenu(
+          onSelected: (final value) {
+            onStatusChange(value);
+          },
+          initialSelection: task.status,
+          dropdownMenuEntries: TaskStatus.values
+              .map(
+                (final e) => DropdownMenuEntry(
+                  value: e,
+                  label: e.name,
+                  labelWidget: e.displayWidget,
+                ),
+              )
+              .toList(),
+        ),
         title: Text(task.title),
       ),
     );

@@ -69,7 +69,7 @@ class TaskProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> toggleTaskStatus(Task task) async {
+  Future<void> updateTaskStatus(Task task) async {
     try {
       // On utilise le use case dédié qui n'a pas la restriction de verrouillage
       await updateTaskStatusUseCase.execute(task);
@@ -77,7 +77,7 @@ class TaskProvider extends ChangeNotifier {
     } on TaskUpdateError catch (e) {
       _errorController.add(e);
     } catch (e) {
-      log("Erreur toggle: $e");
+      log("Erreur update status: $e");
       _errorController.add(UnknownError());
     }
   }

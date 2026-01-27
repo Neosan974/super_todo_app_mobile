@@ -11,7 +11,7 @@ class UpdateTask {
   final TaskRepository repository;
   UpdateTask(this.repository);
 
-  Future<void> execute(Task task) async {
+  Future<void> execute(final Task task) async {
     if (task.status == TaskStatus.done) {
       throw TaskUpdateError(message: "Modification impossible : la tâche est déjà terminée.");
     }
